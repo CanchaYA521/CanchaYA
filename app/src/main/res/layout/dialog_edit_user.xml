@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona el nuevo rol"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/radioGroupRol"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radioUsuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Usuario"
+            android:padding="12dp"
+            android:textSize="16sp"/>
+
+        <RadioButton
+            android:id="@+id/radioAdmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Admin"
+            android:padding="12dp"
+            android:textSize="16sp"/>
+
+        <RadioButton
+            android:id="@+id/radioSuperadmin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SuperAdmin"
+            android:padding="12dp"
+            android:textSize="16sp"/>
+    </RadioGroup>
+
+</LinearLayout>

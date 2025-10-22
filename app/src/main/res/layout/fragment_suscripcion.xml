@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <!-- AppBar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:elevation="0dp">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary_green"
+            app:title="Mi Suscripción"
+            app:titleTextColor="@color/white"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/white"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Contenido -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Plan Actual Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardPlanActual"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp"
+                    android:background="@drawable/gradient_primary">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/plan_actual"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:alpha="0.8"
+                        android:layout_marginBottom="8dp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <TextView
+                            android:id="@+id/tvNombrePlanActual"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Básico"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/white"
+                            tools:text="Pro" />
+
+                        <TextView
+                            android:id="@+id/tvEstado"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="✅ ACTIVA"
+                            android:textSize="12sp"
+                            android:padding="8dp"
+                            android:background="@drawable/bg_chip_rounded"
+                            android:backgroundTint="@color/success_light"
+                            android:textColor="@color/success_dark" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvPrecioPlanActual"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GRATIS"
+                        android:textSize="20sp"
+                        android:textColor="@color/white"
+                        android:layout_marginTop="8dp"
+                        tools:text="S/ 79 / mes" />
+
+                    <TextView
+                        android:id="@+id/tvComisionActual"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="40% de comisión"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"
+                        android:alpha="0.9"
+                        android:layout_marginTop="4dp" />
+
+                    <TextView
+                        android:id="@+id/tvVencimiento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textColor="@color/white"
+                        android:alpha="0.7"
+                        android:layout_marginTop="12dp"
+                        android:visibility="gone"
+                        tools:visibility="visible"
+                        tools:text="Vence: 20 de Nov, 2025" />
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Header Planes Disponibles -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/planes_disponibles"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Loading -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginVertical="32dp" />
+
+            <!-- RecyclerView Planes -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPlanes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:listitem="@layout/item_plan_suscripcion"
+                tools:itemCount="4" />
+
+            <!-- Botón Cancelar Suscripción -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelarSuscripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Cancelar Suscripción"
+                android:textColor="@color/red_error"
+                android:visibility="gone"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                app:strokeColor="@color/red_error"
+                app:icon="@drawable/ic_cancel"
+                app:iconTint="@color/red_error"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Botón flotante volver -->
+    <ImageButton
+        android:id="@+id/btnBack"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_back"
+        android:background="@drawable/bg_circle_white"
+        android:elevation="6dp"
+        app:tint="@color/primary_green"
+        android:contentDescription="Volver"
+        android:visibility="gone"
+        app:layout_anchor="@id/toolbar"
+        app:layout_anchorGravity="start|top" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

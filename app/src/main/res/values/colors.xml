@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ========== COLORES PRINCIPALES ========== -->
+
+    <!-- Primary Green Colors -->
+    <color name="primary_green">#4CAF50</color>
+    <color name="green_primary">#4CAF50</color>
+    <color name="green_dark">#388E3C</color>
+    <color name="green_light">#C8E6C9</color>
+    <color name="accent_green">#8BC34A</color>
+
+
+    <!-- Secondary Orange Colors -->
+    <color name="orange_accent">#FF9800</color>
+    <color name="orange_dark">#F57C00</color>
+    <color name="orange_light">#FFE0B2</color>
+
+    <!-- Purple Colors (Material Design) -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <!-- ========== COLORES DE ESTADO ========== -->
+
+    <!-- Status Colors -->
+    <color name="red_error">#F44336</color>
+    <color name="red_success">#4CAF50</color>
+    <color name="yellow">#FFC107</color>
+    <color name="yellow_warning">#FFC107</color>
+    <color name="blue_info">#2196F3</color>
+    <color name="horario_reservado">#E53935</color>
+
+    <!-- ========== COLORES BÁSICOS ========== -->
+
+    <!-- Basic Colors -->
+    <color name="green">#4CAF50</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="gray">#9E9E9E</color>
+    <color name="gray_light">#F5F5F5</color>
+    <color name="gray_medium">#757575</color>
+    <color name="gray_dark">#616161</color>
+    <color name="red">#F44336</color>
+
+
+    <!-- ========== COLORES DE TEXTO ========== -->
+
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- ========== COLORES DE FONDO ========== -->
+
+    <!-- Background Colors -->
+    <color name="background">#FAFAFA</color>
+    <color name="background_light">#F5F5F5</color>
+    <color name="background_card">#FFFFFF</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="divider">#E0E0E0</color>
+
+    <!-- ========== COLORES ADICIONALES ========== -->
+
+    <!-- Material Design Colors -->
+    <color name="primary">#4CAF50</color>
+    <color name="primary_dark">#388E3C</color>
+    <color name="primary_light">#C8E6C9</color>
+    <color name="accent">#FF9800</color>
+    <color name="secondary">#FF9800</color>
+    <color name="secondary_dark">#F57C00</color>
+
+    <!-- Status -->
+    <color name="success">#4CAF50</color>
+    <color name="error">#F44336</color>
+    <color name="warning">#FFC107</color>
+    <color name="info">#2196F3</color>
+
+    <!-- Transparent -->
+    <color name="transparent">#00000000</color>
+    <color name="semi_transparent">#80000000</color>
+
+    <!-- Social Colors -->
+    <color name="facebook">#3B5998</color>
+    <color name="google">#DB4437</color>
+
+    <!-- Colores para chips de roles -->
+    <color name="chip_usuario">#E3F2FD</color>
+    <color name="chip_admin">#FFF3E0</color>
+    <color name="chip_superadmin">#F3E5F5</color>
+    <color name="chip_activo">#E8F5E9</color>
+    <color name="chip_inactivo">#FFEBEE</color>
+
+    <!-- Colores de Estado -->
+    <color name="success_light">#E8F5E9</color>
+    <color name="success_dark">#2E7D32</color>
+    <color name="divider_color">#E0E0E0</color>
+
+    <!-- ========== COLORES DE PLANES DE SUSCRIPCIÓN (NUEVO) ========== -->
+
+    <!-- BÁSICO (Gris) -->
+    <color name="plan_basico">#9E9E9E</color>
+    <color name="plan_basico_light">#EEEEEE</color>
+    <color name="plan_basico_dark">#616161</color>
+
+    <!-- PRO (Azul) -->
+    <color name="plan_pro">#2196F3</color>
+    <color name="plan_pro_light">#E3F2FD</color>
+    <color name="plan_pro_dark">#1565C0</color>
+    <color name="plan_pro_gradient_start">#2196F3</color>
+    <color name="plan_pro_gradient_end">#1976D2</color>
+
+    <!-- PREMIUM (Dorado) -->
+    <color name="plan_premium">#FFB300</color>
+    <color name="plan_premium_light">#FFF8E1</color>
+    <color name="plan_premium_dark">#FF8F00</color>
+    <color name="plan_premium_gradient_start">#FFD54F</color>
+    <color name="plan_premium_gradient_end">#FFB300</color>
+
+    <!-- ENTERPRISE (Morado) -->
+    <color name="plan_enterprise">#9C27B0</color>
+    <color name="plan_enterprise_light">#F3E5F5</color>
+    <color name="plan_enterprise_dark">#6A1B9A</color>
+    <color name="plan_enterprise_gradient_start">#BA68C8</color>
+    <color name="plan_enterprise_gradient_end">#9C27B0</color>
+    <!-- Colores para planes -->
+    <color name="blue_500">#2196F3</color>
+    <color name="blue_600">#1976D2</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="orange_600">#F57C00</color>
+    <color name="purple_600">#7B1FA2</color>
+    <color name="grey_500">#9E9E9E</color>
+    <color name="grey_600">#757575</color>
+
+</resources>

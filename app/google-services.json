@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "481911532753",
+    "project_id": "canchaya-73d20",
+    "storage_bucket": "canchaya-73d20.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481911532753:android:d46c0844166f42da3529f0",
+        "android_client_info": {
+          "package_name": "com.rojassac.canchaya"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481911532753-8epei9osdq8fpr2p3geupm5ptha1p64k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rojassac.canchaya",
+            "certificate_hash": "bb9ff737ff1308e7afde6292e5d044981c35d8c6"
+          }
+        },
+        {
+          "client_id": "481911532753-3u1mu0g6gn63ssdvuslltcgbl3grkuts.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZptzGNTjUi_KjGv1Xnz-O_EHp8O6HubA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481911532753-3u1mu0g6gn63ssdvuslltcgbl3grkuts.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

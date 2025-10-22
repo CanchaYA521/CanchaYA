@@ -1,0 +1,222 @@
+<resources>
+    <string name="app_name">CanchaYA</string>
+
+    <!-- ==================== AUTH - LOGIN Y REGISTER ==================== -->
+    <string name="bienvenida">¡Bienvenido!</string>
+    <string name="subtitulo_login">Inicia sesión para continuar</string>
+    <string name="login">Iniciar Sesión</string>
+    <string name="o_continua_con">O continúa con</string>
+    <string name="continuar_google">Continuar con Google</string>
+    <string name="no_tienes_cuenta">¿No tienes cuenta?</string>
+    <string name="crear_cuenta">Crear cuenta</string>
+    <string name="registrate">¡Regístrate!</string>
+    <string name="subtitulo_register">Crea tu cuenta para comenzar</string>
+    <string name="nombre_completo">Nombre completo</string>
+    <string name="tipo_usuario">Tipo de usuario</string>
+    <string name="codigo_invitacion">Código de invitación</string>
+    <string name="validar_codigo">Validar código</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="ya_tienes_cuenta">¿Ya tienes cuenta?</string>
+    <string name="inicia_sesion">Inicia sesión</string>
+    <string name="login_title">Iniciar Sesión</string>
+    <string name="register_title">Crear Cuenta</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="nombre">Nombre completo</string>
+    <string name="celular">Celular</string>
+    <string name="login_button">Ingresar</string>
+    <string name="register_button">Registrarse</string>
+    <string name="or_continue_with">O continúa con</string>
+    <string name="google_sign_in">Iniciar con Google</string>
+    <string name="no_account">¿No tienes cuenta?</string>
+    <string name="register_here">Regístrate aquí</string>
+    <string name="have_account">¿Ya tienes cuenta?</string>
+    <string name="login_here">Inicia sesión aquí</string>
+
+    <!-- ==================== SPLASH ==================== -->
+    <string name="splash_slogan">Tu cancha, tu horario, tu juego</string>
+
+    <!-- ==================== BOTTOM NAVIGATION ==================== -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_map">Mapa</string>
+    <string name="nav_reservas">Reservas</string>
+    <string name="nav_perfil">Perfil</string>
+    <string name="nav_horarios">Horarios</string>
+    <string name="nav_ingresos">Ingresos</string>
+    <string name="nav_suscripcion">Suscripción</string>
+
+    <!-- Strings para menu usuario -->
+    <string name="inicio">Inicio</string>
+    <string name="mapa">Mapa</string>
+    <string name="reservas">Reservas</string>
+    <string name="perfil">Perfil</string>
+
+    <!-- ==================== CANCHAS ==================== -->
+    <string name="ubicacion">Ubicación</string>
+    <string name="precio">Precio</string>
+    <string name="horario">Horario</string>
+    <string name="servicios">Servicios</string>
+    <string name="calificacion">Calificación</string>
+    <string name="no_canchas">No tienes canchas asignadas</string>
+    <string name="mis_canchas">Mis Canchas</string>
+    <string name="agregar_cancha">Agregar Cancha</string>
+    <string name="editar_cancha">Editar Cancha</string>
+    <string name="eliminar_cancha">Eliminar Cancha</string>
+
+    <!-- ==================== MENU ==================== -->
+    <string name="menu_icon">☰</string>
+
+    <!-- ==================== RESERVAS ==================== -->
+    <string name="mis_reservas">Mis Reservas</string>
+    <string name="reserva_pendiente">Pendiente</string>
+    <string name="reserva_confirmada">Confirmada</string>
+    <string name="reserva_cancelada">Cancelada</string>
+    <string name="reserva_completada">Completada</string>
+    <string name="no_reservas">No tienes reservas</string>
+
+    <!-- ==================== ADMIN ==================== -->
+    <string name="admin_title">Panel de Administración</string>
+
+    <!-- ==================== SUSCRIPCIÓN ==================== -->
+    <string name="suscripcion_title">💳 Mi Suscripción</string>
+    <string name="plan_actual">Plan Actual</string>
+    <string name="planes_disponibles">Planes Disponibles</string>
+    <string name="actualizar_plan">Actualizar Plan</string>
+    <string name="plan_gratis">Gratis</string>
+    <string name="por_mes">/mes</string>
+    <string name="comision">comisión</string>
+    <string name="vence_en">Vence en %d días</string>
+    <string name="vencimiento">Vence: %s</string>
+    <string name="suscripcion_vencida">⚠️ Suscripción vencida</string>
+    <string name="plan_basico">Básico</string>
+    <string name="plan_pro">Pro</string>
+    <string name="plan_premium">Premium</string>
+    <string name="plan_enterprise">Enterprise</string>
+    <string name="popular_badge">⭐ POPULAR</string>
+
+    <!-- 🆕 NUEVOS STRINGS - Detalles de Suscripción -->
+    <string name="mi_plan">Mi Plan</string>
+    <string name="cambiar_plan">Cambiar Plan</string>
+    <string name="cancelar_suscripcion">Cancelar Suscripción</string>
+    <string name="renovar_suscripcion">Renovar Suscripción</string>
+    <string name="proximo_cobro">Próximo cobro: %s</string>
+    <string name="estado_activa">✅ ACTIVA</string>
+    <string name="estado_vencida">⚠️ VENCIDA</string>
+    <string name="estado_cancelada">❌ CANCELADA</string>
+    <string name="estado_suspendida">⏸️ SUSPENDIDA</string>
+
+    <!-- 🆕 Características de Planes -->
+    <string name="caracteristica_comision">%d%% de comisión</string>
+    <string name="caracteristica_retiro">Retiro en %d días</string>
+    <string name="caracteristica_retiro_inmediato">Retiro inmediato</string>
+    <string name="caracteristica_destacado">Destacado en búsquedas</string>
+    <string name="caracteristica_prioridad">Posición prioritaria</string>
+    <string name="caracteristica_marketing">Marketing incluido</string>
+    <string name="caracteristica_multicanchas">Hasta %d canchas</string>
+    <string name="caracteristica_whitelabel">White label</string>
+    <string name="caracteristica_soporte_email">Soporte por email</string>
+    <string name="caracteristica_soporte_chat">Soporte por chat</string>
+    <string name="caracteristica_soporte_prioritario">Soporte prioritario 24/7</string>
+
+    <!-- 🆕 Diálogos de Suscripción -->
+    <string name="dialog_cambiar_plan_title">Cambiar a plan %s</string>
+    <string name="dialog_cambiar_plan_mensaje">¿Deseas cambiar tu plan actual a %1$s por S/ %2$.2f/mes?</string>
+    <string name="dialog_cancelar_suscripcion_title">Cancelar suscripción</string>
+    <string name="dialog_cancelar_suscripcion_mensaje">¿Estás seguro de cancelar tu suscripción? Volverás al plan Básico.</string>
+    <string name="confirmar_cambio">Confirmar cambio</string>
+    <string name="confirmar_cancelacion">Confirmar cancelación</string>
+
+    <!-- 🆕 Mensajes de Suscripción -->
+    <string name="suscripcion_cambiada_exito">✅ Plan actualizado exitosamente</string>
+    <string name="suscripcion_cancelada_exito">Suscripción cancelada. Volverás al plan Básico.</string>
+    <string name="error_cambiar_plan">Error al cambiar de plan</string>
+    <string name="error_cancelar_suscripcion">Error al cancelar suscripción</string>
+    <string name="ya_tienes_este_plan">Ya tienes este plan activo</string>
+
+    <!-- ==================== MÉTODOS DE PAGO ==================== -->
+    <string name="metodo_pago_title">Seleccionar método de pago</string>
+    <string name="total_pagar">Total a pagar: S/ %.2f</string>
+    <string name="yape">💛 Yape</string>
+    <string name="plin">💙 Plin</string>
+    <string name="tarjeta">💳 Tarjeta</string>
+    <string name="pagar">Pagar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="procesando_pago">Procesando pago...</string>
+    <string name="pago_exitoso">✅ Pago procesado exitosamente</string>
+    <string name="pago_error">❌ Error al procesar el pago</string>
+
+    <!-- Formulario Yape -->
+    <string name="yape_instrucciones">Ingresa tu número de celular y el código de aprobación de Yape</string>
+    <string name="yape_numero">Número de celular</string>
+    <string name="yape_codigo">Código de aprobación (6 dígitos)</string>
+    <string name="yape_error_numero">Número de celular inválido</string>
+    <string name="yape_error_codigo">Código de aprobación inválido</string>
+
+    <!-- Formulario Plin -->
+    <string name="plin_instrucciones">Ingresa tu número de celular registrado en Plin</string>
+    <string name="plin_numero">Número de celular</string>
+    <string name="plin_error_numero">Número de celular inválido</string>
+
+    <!-- Formulario Tarjeta -->
+    <string name="tarjeta_numero">Número de tarjeta</string>
+    <string name="tarjeta_nombre">Nombre del titular</string>
+    <string name="tarjeta_mes">MM</string>
+    <string name="tarjeta_anio">AA</string>
+    <string name="tarjeta_cvv">CVV</string>
+    <string name="tarjeta_error_numero">Número de tarjeta inválido</string>
+    <string name="tarjeta_error_nombre">Nombre del titular requerido</string>
+    <string name="tarjeta_error_expiracion">Fecha de expiración inválida</string>
+    <string name="tarjeta_error_cvv">CVV inválido</string>
+
+    <!-- 🆕 NUEVOS - Validaciones de Tarjeta -->
+    <string name="tarjeta_modo_demo">🎭 Modo Demo - Pago Simulado</string>
+    <string name="tarjeta_prueba_info">Usa cualquier tarjeta de prueba:\n4111 1111 1111 1111 (Visa)\n5555 5555 5555 4444 (Mastercard)</string>
+    <string name="validando_tarjeta">Validando tarjeta...</string>
+    <string name="creando_cargo">Procesando pago...</string>
+    <string name="cargo_exitoso">✅ Cargo procesado: S/ %.2f</string>
+    <string name="cargo_fallido">❌ %s</string>
+
+    <!-- ==================== PERFIL ==================== -->
+    <string name="perfil_title">Mi Perfil</string>
+    <string name="cerrar_sesion">Cerrar Sesión</string>
+    <string name="editar_perfil">Editar Perfil</string>
+    <string name="cambiar_contraseña">Cambiar Contraseña</string>
+
+    <!-- ==================== DIÁLOGOS ==================== -->
+    <string name="aceptar">Aceptar</string>
+    <string name="continuar">Continuar</string>
+    <string name="guardar">Guardar</string>
+    <string name="eliminar">Eliminar</string>
+    <string name="confirmar">Confirmar</string>
+    <string name="si">Sí</string>
+    <string name="no">No</string>
+
+    <!-- ==================== MENSAJES DE ERROR ==================== -->
+    <string name="error_generico">Ocurrió un error</string>
+    <string name="error_conexion">Error de conexión</string>
+    <string name="error_auth">Error de autenticación</string>
+    <string name="campos_vacios">Por favor completa todos los campos</string>
+    <string name="email_invalido">Email inválido</string>
+    <string name="password_corta">La contraseña debe tener al menos 6 caracteres</string>
+
+    <!-- ==================== MENSAJES DE ÉXITO ==================== -->
+    <string name="registro_exitoso">Cuenta creada exitosamente</string>
+    <string name="login_exitoso">Bienvenido</string>
+    <string name="guardado_exitoso">Guardado exitosamente</string>
+    <string name="eliminado_exitoso">Eliminado exitosamente</string>
+
+    <!-- ==================== OTROS ==================== -->
+    <string name="cargando">Cargando...</string>
+    <string name="sin_resultados">No hay resultados</string>
+    <string name="intenta_nuevamente">Intenta nuevamente</string>
+
+    <!-- Errores de validación -->
+    <string name="error_email_vacio">El email no puede estar vacío</string>
+    <string name="error_email_invalido">Email inválido</string>
+    <string name="error_password_vacio">La contraseña no puede estar vacía</string>
+    <string name="error_password_corto">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="error_nombre_vacio">El nombre no puede estar vacío</string>
+    <string name="error_celular_vacio">El celular no puede estar vacío</string>
+    <string name="error_celular_invalido">El celular debe tener 9 dígitos</string>
+
+</resources>

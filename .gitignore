@@ -1,0 +1,45 @@
+# Archivos de compilación
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Carpetas de build
+.gradle/
+build/
+*/build/
+app/build/
+
+# Archivos locales
+local.properties
+
+# IDE - Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea/workspace.xml
+.idea/gradle.xml
+.idea/libraries/
+.idea/modules.xml
+
+# Keystore (NUNCA subir)
+*.jks
+*.keystore
+key.properties
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# NDK
+obj/
+.externalNativeBuild
+.cxx/
+
+# Capturas
+/captures

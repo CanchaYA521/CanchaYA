@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardUsuario"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardElevation="4dp"
+    app:cardCornerRadius="12dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Avatar circular con inicial -->
+        <TextView
+            android:id="@+id/tvAvatar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/circle_background"
+            android:gravity="center"
+            android:text="U"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <!-- Nombre -->
+        <TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Nombre del Usuario"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintTop_toTopOf="@id/tvAvatar"
+            app:layout_constraintStart_toEndOf="@id/tvAvatar"
+            app:layout_constraintEnd_toStartOf="@id/chipRol"/>
+
+        <!-- Email -->
+        <TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="email@ejemplo.com"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintTop_toBottomOf="@id/tvNombre"
+            app:layout_constraintStart_toEndOf="@id/tvAvatar"
+            app:layout_constraintEnd_toStartOf="@id/chipRol"/>
+
+        <!-- Chip de Rol -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipRol"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Usuario"
+            android:textSize="12sp"
+            app:chipMinHeight="32dp"
+            app:layout_constraintTop_toTopOf="@id/tvAvatar"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Chip de Estado -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activo"
+            android:textSize="12sp"
+            app:chipMinHeight="32dp"
+            app:layout_constraintTop_toBottomOf="@id/chipRol"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+        <!-- Detalles expandibles -->
+        <LinearLayout
+            android:id="@+id/layoutDetalles"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/tvAvatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <!-- Fecha de registro -->
+            <TextView
+                android:id="@+id/tvFechaRegistro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Registro: 01/01/2024"
+                android:textSize="13sp"
+                android:textColor="@android:color/darker_gray"
+                android:drawableStart="@drawable/ic_calendar"
+                android:drawablePadding="8dp"
+                android:layout_marginBottom="4dp"/>
+
+            <!-- Cancha asignada -->
+            <TextView
+                android:id="@+id/tvCanchaAsignada"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancha: ABC123"
+                android:textSize="13sp"
+                android:textColor="@android:color/darker_gray"
+                android:drawableStart="@drawable/ic_cancha"
+                android:drawablePadding="8dp"
+                android:visibility="gone"/>
+
+            <!-- Botones de acción -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:gravity="end">
+
+                <!-- Botón Editar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEdit"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Editar usuario"
+                    app:icon="@drawable/ic_edit"
+                    app:iconTint="?attr/colorPrimary"/>
+
+                <!-- Botón Activar/Desactivar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnToggleStatus"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Cambiar estado"
+                    app:icon="@drawable/ic_lock"
+                    app:iconTint="?attr/colorSecondary"/>
+
+                <!-- Botón Asignar Cancha -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAssignCancha"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Asignar cancha"
+                    android:visibility="gone"
+                    app:icon="@drawable/ic_cancha"
+                    app:iconTint="#4CAF50"/>
+
+                <!-- Botón Eliminar -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDelete"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:contentDescription="Eliminar usuario"
+                    app:icon="@drawable/ic_delete"
+                    app:iconTint="#F44336"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>

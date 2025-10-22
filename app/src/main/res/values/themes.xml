@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base Application Theme -->
+    <style name="Base.Theme.CanchaYA" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/green_primary</item>
+        <item name="colorPrimaryVariant">@color/green_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/orange_accent</item>
+        <item name="colorSecondaryVariant">@color/orange_dark</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorError">@color/red_error</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/gray_dark</item>
+        <item name="android:statusBarColor">@color/green_primary</item>
+    </style>
+
+    <!-- Main App Theme -->
+    <style name="Theme.CanchaYA" parent="Base.Theme.CanchaYA" />
+
+    <!-- Theme without ActionBar (ESTE ES EL QUE FALTABA) -->
+    <style name="Theme.CanchaYA.NoActionBar" parent="Theme.CanchaYA">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+    </style>
+
+    <!-- Splash Screen Theme -->
+    <style name="Theme.CanchaYA.Splash" parent="Theme.CanchaYA.NoActionBar">
+        <item name="android:windowBackground">@color/green_primary</item>
+        <item name="android:statusBarColor">@color/green_primary</item>
+        <item name="android:navigationBarColor">@color/green_primary</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="Widget.CanchaYA.Button" parent="Widget.Material3.Button">
+        <item name="android:textAllCaps">false</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="Widget.CanchaYA.Button.Primary" parent="Widget.CanchaYA.Button">
+        <item name="backgroundTint">@color/green_primary</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Widget.CanchaYA.Button.Secondary" parent="Widget.CanchaYA.Button">
+        <item name="backgroundTint">@color/orange_accent</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="Widget.CanchaYA.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textAllCaps">false</item>
+        <item name="strokeColor">@color/green_primary</item>
+        <item name="android:textColor">@color/green_primary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <!-- TextInputLayout Styles -->
+    <style name="Widget.CanchaYA.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/green_primary</item>
+        <item name="hintTextColor">@color/green_primary</item>
+        <item name="boxStrokeWidth">2dp</item>
+    </style>
+
+    <!-- CardView Style -->
+    <style name="Widget.CanchaYA.CardView" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">12dp</item>
+        <item name="cardElevation">4dp</item>
+        <item name="contentPadding">16dp</item>
+    </style>
+
+    <!-- BottomNavigationView Style -->
+    <style name="Widget.CanchaYA.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/green_primary</item>
+        <item name="itemTextColor">@color/green_primary</item>
+        <item name="elevation">8dp</item>
+    </style>
+
+</resources>
