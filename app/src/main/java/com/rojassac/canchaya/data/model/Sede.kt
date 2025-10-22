@@ -8,12 +8,13 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
 /**
- * 🆕 NUEVO MODELO: Sede (Conjunto de canchas en una ubicación)
- * Fecha: 21 de Octubre 2025
- * 🔧 CORREGIDO: 22 de Octubre 2025 - Sintaxis de funciones auxiliares
+ * 🆕 ACTUALIZADO: Sistema de código de invitación simplificado (22 Oct 2025)
+ * - Código formato: SE00000001
+ * - No se reutiliza automáticamente
+ * - SuperAdmin puede reactivar manualmente
  */
 @Parcelize
-data class Sede(
+data class  Sede(
     @DocumentId
     val id: String = "",
     val nombre: String = "",
@@ -31,7 +32,6 @@ data class Sede(
     // Horarios
     val horaApertura: String = "06:00",
     val horaCierre: String = "23:00",
-
     val imageUrl: String = "",
 
     // Estado de la sede
@@ -40,8 +40,10 @@ data class Sede(
     // Lista de IDs de canchas que pertenecen a esta sede
     val canchasIds: @RawValue List<String> = emptyList(),
 
-    // Administrador responsable
-    val adminId: String = "",
+    // 🆕 SISTEMA DE CÓDIGO DE INVITACIÓN (22 Oct 2025)
+    val codigoInvitacion: String = "",      // Formato: SE00000001
+    val codigoUsado: Boolean = false,       // true = código fue usado
+    val adminId: String = "",               // ID del admin que usó el código (vacío si se liberó)
 
     // Timestamps
     val fechaCreacion: @RawValue Any? = null,
@@ -54,11 +56,11 @@ data class Sede(
     @Exclude
     @get:Exclude
     var fechaActualizacionTimestamp: Timestamp? = null
+
 ) : Parcelable {
 
     /**
-     * 🆕 NUEVA FUNCIÓN: Obtener cantidad de canchas (22 Oct 2025)
-     * Usado por SedesAdapter para mostrar el contador de canchas
+     * Obtener cantidad de canchas
      */
     @Exclude
     fun getCantidadCanchas(): Int {
@@ -66,8 +68,7 @@ data class Sede(
     }
 
     /**
-     * 🆕 NUEVA FUNCIÓN: Validación de coordenadas GPS (22 Oct 2025)
-     * Usado por SedesAdapter para verificar si se puede mostrar el mapa
+     * Validación de coordenadas GPS
      */
     @Exclude
     fun tieneCoordenadasValidas(): Boolean {
@@ -75,8 +76,7 @@ data class Sede(
     }
 
     /**
-     * 🆕 NUEVA FUNCIÓN: Formato de horario de operación (22 Oct 2025)
-     * Usado por SedesAdapter para mostrar el horario en formato legible
+     * Formato de horario de operación
      */
     @Exclude
     fun getHorarioDisplay(): String {
@@ -84,8 +84,7 @@ data class Sede(
     }
 
     /**
-     * 🆕 NUEVA FUNCIÓN: Obtener estado como texto (22 Oct 2025)
-     * Usado para mostrar "Activa" o "Inactiva"
+     * Obtener estado como texto
      */
     @Exclude
     fun getEstadoTexto(): String {
@@ -93,10 +92,26 @@ data class Sede(
     }
 
     /**
-     * 🆕 NUEVA FUNCIÓN: Validar si tiene admin asignado (22 Oct 2025)
+     * Validar si tiene admin asignado
      */
     @Exclude
     fun tieneAdminAsignado(): Boolean {
-        return adminId.isNotEmpty()
+        return adminId.isNotEmpty() && codigoUsado
+    }
+
+    /**
+     * 🆕 NUEVO: Validar si código está disponible para uso (22 Oct 2025)
+     */
+    @Exclude
+    fun codigoDisponible(): Boolean {
+        return codigoInvitacion.isNotEmpty() && !codigoUsado
+    }
+
+    /**
+     * 🆕 NUEVO: Validar si código está liberado (puede ser reactivado) (22 Oct 2025)
+     */
+    @Exclude
+    fun codigoLiberado(): Boolean {
+        return codigoUsado && adminId.isEmpty()
     }
 }

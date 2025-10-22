@@ -11,14 +11,12 @@ object Constants {
     const val HORARIOS_COLLECTION = "horarios"
     const val RESENAS_COLLECTION = "resenas"
     const val CODIGO_LOGS_COLLECTION = "codigo_logs"
+    const val SEDES_COLLECTION = "sedes"  // 🆕 AGREGADO (22 Oct 2025)
 
     // 🆕 NUEVAS COLECCIONES - Sistema de Pagos y Suscripciones
     const val SUBSCRIPTIONS_COLLECTION = "subscriptions"
     const val PLANS_COLLECTION = "plans"
     const val CARGOS_COLLECTION = "cargos"
-
-    // 🆕 NUEVA COLECCIÓN - Sistema de Sedes (22 Oct 2025)
-    const val SEDES_COLLECTION = "sedes"
 
     // ========================
     // SharedPreferences
@@ -32,6 +30,10 @@ object Constants {
     // ========================
     const val CODIGO_EXPIRACION_DIAS = 7
     const val CODIGO_LENGTH = 8
+
+    // 🆕 NUEVO: Formato de códigos de sede (22 Oct 2025)
+    const val CODIGO_SEDE_PREFIX = "SE"
+    const val CODIGO_SEDE_LENGTH = 10  // SE00000001 = 10 caracteres
 
     // ========================
     // Formato de fechas
