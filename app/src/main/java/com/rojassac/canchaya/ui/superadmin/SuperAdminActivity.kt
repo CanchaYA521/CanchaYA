@@ -3,15 +3,18 @@ package com.rojassac.canchaya.ui.superadmin
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.google.android.material.tabs.TabLayout
 import com.rojassac.canchaya.R
 import com.rojassac.canchaya.databinding.ActivitySuperadminBinding
-import com.rojassac.canchaya.ui.superadmin.fragments.CanchasGlobalesFragment
 import com.rojassac.canchaya.ui.superadmin.fragments.ConfiguracionFragment
-import com.rojassac.canchaya.ui.superadmin.fragments.CrearCanchaFragment
 import com.rojassac.canchaya.ui.superadmin.fragments.EstadisticasFragment
+import com.rojassac.canchaya.ui.superadmin.fragments.ListaSedesFragment // 🆕 NUEVO IMPORT
 import com.rojassac.canchaya.ui.superadmin.fragments.UsuariosManagementFragment
 
+/**
+ * 🔄 ACTUALIZADO: SuperAdminActivity con BottomNavigationView (22 Oct 2025)
+ * ANTES: TabLayout con 5 tabs (Canchas Globales, Crear Cancha, Usuarios, Estadísticas, Configuración)
+ * AHORA: BottomNavigationView con 4 tabs (Sedes, Dashboard, Usuarios, Configuración)
+ */
 class SuperAdminActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySuperadminBinding
@@ -21,37 +24,51 @@ class SuperAdminActivity : AppCompatActivity() {
         binding = ActivitySuperadminBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupTabs()
+        // 🆕 NUEVO: Configurar Toolbar
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = "SuperAdmin Panel"
 
-        // Cargar fragment inicial
+        // 🆕 NUEVO: Configurar BottomNavigationView (reemplaza setupTabs)
+        setupBottomNavigation()
+
+        // Cargar fragment inicial (Sedes)
         if (savedInstanceState == null) {
-            loadFragment(CanchasGlobalesFragment())
+            loadFragment(ListaSedesFragment()) // 🆕 CAMBIADO: antes era CanchasGlobalesFragment
         }
     }
 
-    private fun setupTabs() {
-        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Canchas Globales"))
-        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Crear Cancha"))
-        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Usuarios"))
-        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Estadísticas"))
-        binding.tabLayout.addTab(binding.tabLayout.newTab().setText("Configuración"))
-
-        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                when (tab?.position) {
-                    0 -> loadFragment(CanchasGlobalesFragment())
-                    1 -> loadFragment(CrearCanchaFragment())
-                    2 -> loadFragment(UsuariosManagementFragment())
-                    3 -> loadFragment(EstadisticasFragment())
-                    4 -> loadFragment(ConfiguracionFragment())
+    /**
+     * 🆕 NUEVA FUNCIÓN: Configurar BottomNavigationView
+     * Reemplaza la función setupTabs() anterior
+     */
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_sedes -> {
+                    loadFragment(ListaSedesFragment()) // 🆕 NUEVO
+                    true
                 }
+                R.id.nav_dashboard -> {
+                    loadFragment(EstadisticasFragment()) // ✅ EXISTENTE (ahora se llama Dashboard)
+                    true
+                }
+                R.id.nav_usuarios -> {
+                    loadFragment(UsuariosManagementFragment()) // ✅ EXISTENTE
+                    true
+                }
+                R.id.nav_configuracion -> {
+                    loadFragment(ConfiguracionFragment()) // ✅ EXISTENTE
+                    true
+                }
+                else -> false
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {}
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
+        }
     }
 
+    /**
+     * ✅ FUNCIÓN EXISTENTE (NO MODIFICADA)
+     * Carga un fragment en el contenedor
+     */
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)

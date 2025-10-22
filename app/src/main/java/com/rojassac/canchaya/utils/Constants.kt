@@ -17,6 +17,9 @@ object Constants {
     const val PLANS_COLLECTION = "plans"
     const val CARGOS_COLLECTION = "cargos"
 
+    // 🆕 NUEVA COLECCIÓN - Sistema de Sedes (22 Oct 2025)
+    const val SEDES_COLLECTION = "sedes"
+
     // ========================
     // SharedPreferences
     // ========================

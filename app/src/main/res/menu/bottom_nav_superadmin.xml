@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/nav_usuarios"
-        android:icon="@drawable/ic_person"
-        android:title="Usuarios" />
 
+    <!-- 🏢 SEDES (Principal) -->
     <item
-        android:id="@+id/nav_todas_canchas"
-        android:icon="@drawable/ic_cancha"
-        android:title="Canchas" />
+        android:id="@+id/nav_sedes"
+        android:icon="@drawable/ic_building"
+        android:title="Sedes" />
 
-    <item
-        android:id="@+id/nav_ingresos"
-        android:icon="@drawable/ic_money"
-        android:title="Ingresos" />
-
+    <!-- 📊 DASHBOARD (Estadísticas) -->
     <item
         android:id="@+id/nav_dashboard"
-        android:icon="@drawable/ic_home"
+        android:icon="@drawable/ic_dashboard"
         android:title="Dashboard" />
+
+    <!-- 👥 USUARIOS -->
+    <item
+        android:id="@+id/nav_usuarios"
+        android:icon="@drawable/ic_users"
+        android:title="Usuarios" />
+
+    <!-- ⚙️ CONFIGURACIÓN -->
+    <item
+        android:id="@+id/nav_configuracion"
+        android:icon="@drawable/ic_settings"
+        android:title="Ajustes" />
+
 </menu>

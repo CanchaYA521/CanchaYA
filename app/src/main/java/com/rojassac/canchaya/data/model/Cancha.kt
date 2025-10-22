@@ -12,7 +12,6 @@ import kotlinx.parcelize.RawValue
 data class Cancha(
     @DocumentId
     val id: String = "",
-
     val nombre: String = "",
     val direccion: String = "",
     val descripcion: String = "",
@@ -22,7 +21,6 @@ data class Cancha(
     // ✅ COORDENADAS PARA EL MAPA
     val latitud: Double = 0.0,
     val longitud: Double = 0.0,
-
     val precioHora: Double = 0.0,
 
     // ✅ IMÁGENES (soporte para ambos formatos)
@@ -31,7 +29,6 @@ data class Cancha(
 
     // ✅ SERVICIOS
     val servicios: List<String> = listOf(), // "Estacionamiento", "Vestuarios", etc.
-
     val horarioApertura: String = "08:00",
     val horarioCierre: String = "23:00",
 
@@ -46,16 +43,19 @@ data class Cancha(
     val codigoInvitacion: String = "",
     val codigoExpiracion: Long = 0L,
     val codigoUsado: Boolean = false,
-
     val tipoNegocio: String = "cancha_individual", // "sede" o "cancha_individual"
 
     // Estado
     val activo: Boolean = true,
     val activa: Boolean = true, // ✅ Para compatibilidad
 
-    // ✅ FECHA: Usar @RawValue para que Parcelize lo acepte
+    // ✅ FECHAS: Usar @RawValue para que Parcelize lo acepte
     @PropertyName("fechaCreacion")
     val fechaCreacion: @RawValue Any? = null, // ✅ Puede ser Long o Timestamp
+
+    // 🆕 NUEVO CAMPO: Fecha de asignación (22 Oct 2025)
+    @PropertyName("fechaAsignacion")
+    val fechaAsignacion: @RawValue Any? = null, // ✅ Timestamp de Firebase
 
     // Reseñas
     val totalResenas: Int = 0,
@@ -86,4 +86,28 @@ data class Cancha(
             is Timestamp -> fechaCreacion.toDate().time
             else -> 0L
         }
+
+    // 🆕 NUEVO HELPER: obtener fecha de asignación como Long (22 Oct 2025)
+    @get:Exclude
+    val fechaAsignacionMillis: Long
+        get() = when (fechaAsignacion) {
+            is Long -> fechaAsignacion
+            is Timestamp -> fechaAsignacion.toDate().time
+            else -> 0L
+        }
+
+    // ✅ Helper: verificar si tiene estado activo (cualquier variante)
+    @get:Exclude
+    val estaActiva: Boolean
+        get() = activo || activa
+
+    // ✅ Helper: obtener horario completo formateado
+    @get:Exclude
+    val horarioCompleto: String
+        get() = "$horarioApertura - $horarioCierre"
+
+    // 🆕 NUEVO HELPER: verificar si tiene admin asignado (22 Oct 2025)
+    @get:Exclude
+    val tieneAdminAsignado: Boolean
+        get() = !adminId.isNullOrEmpty() || !adminAsignado.isNullOrEmpty()
 }

@@ -10,12 +10,12 @@ import kotlinx.parcelize.RawValue
 /**
  * 🆕 NUEVO MODELO: Sede (Conjunto de canchas en una ubicación)
  * Fecha: 21 de Octubre 2025
+ * 🔧 CORREGIDO: 22 de Octubre 2025 - Sintaxis de funciones auxiliares
  */
 @Parcelize
 data class Sede(
     @DocumentId
     val id: String = "",
-
     val nombre: String = "",
     val direccion: String = "",
     val descripcion: String = "",
@@ -57,7 +57,8 @@ data class Sede(
 ) : Parcelable {
 
     /**
-     * Método para obtener cantidad de canchas
+     * 🆕 NUEVA FUNCIÓN: Obtener cantidad de canchas (22 Oct 2025)
+     * Usado por SedesAdapter para mostrar el contador de canchas
      */
     @Exclude
     fun getCantidadCanchas(): Int {
@@ -65,7 +66,8 @@ data class Sede(
     }
 
     /**
-     * Validación de coordenadas
+     * 🆕 NUEVA FUNCIÓN: Validación de coordenadas GPS (22 Oct 2025)
+     * Usado por SedesAdapter para verificar si se puede mostrar el mapa
      */
     @Exclude
     fun tieneCoordenadasValidas(): Boolean {
@@ -73,10 +75,28 @@ data class Sede(
     }
 
     /**
-     * Formato de horario de operación
+     * 🆕 NUEVA FUNCIÓN: Formato de horario de operación (22 Oct 2025)
+     * Usado por SedesAdapter para mostrar el horario en formato legible
      */
     @Exclude
     fun getHorarioDisplay(): String {
         return "$horaApertura - $horaCierre"
+    }
+
+    /**
+     * 🆕 NUEVA FUNCIÓN: Obtener estado como texto (22 Oct 2025)
+     * Usado para mostrar "Activa" o "Inactiva"
+     */
+    @Exclude
+    fun getEstadoTexto(): String {
+        return if (activa) "Activa" else "Inactiva"
+    }
+
+    /**
+     * 🆕 NUEVA FUNCIÓN: Validar si tiene admin asignado (22 Oct 2025)
+     */
+    @Exclude
+    fun tieneAdminAsignado(): Boolean {
+        return adminId.isNotEmpty()
     }
 }

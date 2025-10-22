@@ -13,30 +13,32 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.rojassac.canchaya.R
 import com.rojassac.canchaya.databinding.FragmentCrearSedeBinding
 import com.rojassac.canchaya.data.model.Sede
+import com.rojassac.canchaya.ui.superadmin.SuperAdminViewModel
+import com.rojassac.canchaya.utils.Resource
 import java.util.*
 
 /**
- * 🆕 NUEVO FRAGMENT: Crear/Editar Sede con GPS y horarios (21 Oct 2025)
+ * 🔄 ACTUALIZADO: Usar ViewModel en vez de Firestore directo (22 Oct 2025)
  */
 class CrearSedeFragment : Fragment() {
 
     private var _binding: FragmentCrearSedeBinding? = null
     private val binding get() = _binding!!
 
-    private val firestore = FirebaseFirestore.getInstance()
+    // 🔄 CAMBIADO: Usar ViewModel en vez de Firestore directo
+    private val viewModel: SuperAdminViewModel by activityViewModels()
+
     private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private var imageUri: Uri? = null
@@ -77,10 +79,10 @@ class CrearSedeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         setupListeners()
+        setupObservers() // 🆕 NUEVO: Observar resultados del ViewModel
 
         // Si hay una sede para editar, cargar datos
         sedeToEdit?.let { cargarDatosSede(it) }
@@ -126,6 +128,33 @@ class CrearSedeFragment : Fragment() {
         }
     }
 
+    // 🆕 NUEVO: Observar resultados del ViewModel
+    private fun setupObservers() {
+        viewModel.updateSedeResult.observe(viewLifecycleOwner) { resource ->
+            when (resource) {
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    binding.btnGuardar.isEnabled = false
+                }
+                is Resource.Success -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnGuardar.isEnabled = true
+                    Toast.makeText(
+                        requireContext(),
+                        if (sedeToEdit != null) "Sede actualizada correctamente" else "Sede creada correctamente",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    requireActivity().onBackPressed()
+                }
+                is Resource.Error -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnGuardar.isEnabled = true
+                    Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private fun solicitarPermisoUbicacion() {
         when {
             ContextCompat.checkSelfPermission(
@@ -143,18 +172,14 @@ class CrearSedeFragment : Fragment() {
     private fun obtenerUbicacionActual() {
         try {
             binding.progressBar.visibility = View.VISIBLE
-
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
                     binding.progressBar.visibility = View.GONE
-
                     if (location != null) {
                         currentLatitud = location.latitude
                         currentLongitud = location.longitude
-
                         binding.etLatitud.setText(currentLatitud.toString())
                         binding.etLongitud.setText(currentLongitud.toString())
-
                         Toast.makeText(requireContext(), "Ubicación obtenida correctamente", Toast.LENGTH_SHORT).show()
                     } else {
                         Toast.makeText(requireContext(), "No se pudo obtener la ubicación", Toast.LENGTH_SHORT).show()
@@ -238,9 +263,6 @@ class CrearSedeFragment : Fragment() {
     }
 
     private fun guardarSede() {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.btnGuardar.isEnabled = false
-
         val nombre = binding.etNombre.text.toString().trim()
         val direccion = binding.etDireccion.text.toString().trim()
         val descripcion = binding.etDescripcion.text.toString().trim()
@@ -260,7 +282,7 @@ class CrearSedeFragment : Fragment() {
         } else {
             // Guardar sin imagen o con la URL existente
             val imageUrl = sedeToEdit?.imageUrl ?: ""
-            guardarSedeEnFirestore(
+            guardarSedeEnViewModel(
                 nombre, direccion, descripcion, latitud, longitud,
                 telefono, email, horaApertura, horaCierre, imageUrl
             )
@@ -272,13 +294,16 @@ class CrearSedeFragment : Fragment() {
         latitud: Double, longitud: Double, telefono: String,
         email: String, horaApertura: String, horaCierre: String
     ) {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.btnGuardar.isEnabled = false
+
         val fileName = "sedes/${UUID.randomUUID()}.jpg"
         val storageRef = storage.reference.child(fileName)
 
         storageRef.putFile(imageUri!!)
             .addOnSuccessListener {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    guardarSedeEnFirestore(
+                    guardarSedeEnViewModel(
                         nombre, direccion, descripcion, latitud, longitud,
                         telefono, email, horaApertura, horaCierre, uri.toString()
                     )
@@ -291,63 +316,32 @@ class CrearSedeFragment : Fragment() {
             }
     }
 
-    private fun guardarSedeEnFirestore(
+    // 🔄 CAMBIADO: Usar ViewModel en vez de Firestore directo
+    private fun guardarSedeEnViewModel(
         nombre: String, direccion: String, descripcion: String,
         latitud: Double, longitud: Double, telefono: String,
         email: String, horaApertura: String, horaCierre: String,
         imageUrl: String
     ) {
-        val sedeData = hashMapOf(
-            "nombre" to nombre,
-            "direccion" to direccion,
-            "descripcion" to descripcion,
-            "latitud" to latitud,
-            "longitud" to longitud,
-            "telefono" to telefono,
-            "email" to email,
-            "horaApertura" to horaApertura,
-            "horaCierre" to horaCierre,
-            "imageUrl" to imageUrl,
-            "activa" to true,
-            "canchasIds" to emptyList<String>(),
-            "adminId" to auth.currentUser?.uid.orEmpty(),
-            "fechaActualizacion" to Timestamp.now()
+        val sede = Sede(
+            id = sedeToEdit?.id ?: "",
+            nombre = nombre,
+            direccion = direccion,
+            descripcion = descripcion,
+            latitud = latitud,
+            longitud = longitud,
+            telefono = telefono,
+            email = email,
+            horaApertura = horaApertura,
+            horaCierre = horaCierre,
+            imageUrl = imageUrl,
+            activa = true,
+            canchasIds = sedeToEdit?.canchasIds ?: emptyList(),
+            adminId = auth.currentUser?.uid.orEmpty()
         )
 
-        if (sedeToEdit != null) {
-            // Actualizar sede existente
-            firestore.collection("sedes")
-                .document(sedeToEdit!!.id)
-                .update(sedeData as Map<String, Any>)
-                .addOnSuccessListener {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnGuardar.isEnabled = true
-                    Toast.makeText(requireContext(), "Sede actualizada correctamente", Toast.LENGTH_SHORT).show()
-                    requireActivity().onBackPressed()
-                }
-                .addOnFailureListener { e ->
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnGuardar.isEnabled = true
-                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            // Crear nueva sede
-            sedeData["fechaCreacion"] = Timestamp.now()
-
-            firestore.collection("sedes")
-                .add(sedeData)
-                .addOnSuccessListener {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnGuardar.isEnabled = true
-                    Toast.makeText(requireContext(), "Sede creada correctamente", Toast.LENGTH_SHORT).show()
-                    requireActivity().onBackPressed()
-                }
-                .addOnFailureListener { e ->
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnGuardar.isEnabled = true
-                    Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
+        // 🆕 NUEVO: Guardar a través del ViewModel
+        viewModel.guardarSede(sede)
     }
 
     private fun cargarDatosSede(sede: Sede) {

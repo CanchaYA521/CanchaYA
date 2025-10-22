@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 🆕 NUEVO: Selector de colores para Bottom Navigation (21 Oct 2025) -->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="@color/primary" android:state_checked="true" />
-    <item android:color="#757575" android:state_checked="false" />
+    <!-- Color cuando está seleccionado -->
+    <item android:color="@color/green" android:state_checked="true" />
+    <!-- Color cuando NO está seleccionado -->
+    <item android:color="@color/gray" />
 </selector>
