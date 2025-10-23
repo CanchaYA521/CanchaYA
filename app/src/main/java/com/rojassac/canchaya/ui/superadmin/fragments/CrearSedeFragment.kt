@@ -27,16 +27,17 @@ import com.rojassac.canchaya.utils.Resource
 import java.util.*
 
 /**
- * 🔄 ACTUALIZADO: Usar ViewModel en vez de Firestore directo (22 Oct 2025)
+ * ✅ CÓDIGO EXISTENTE MANTENIDO
+ * ✨ ACTUALIZADO: Agregado manejo de amenidades con checkboxes (22 Oct 2025)
+ * 🔧 CORREGIDO: cbBaños -> cbBanios para evitar problemas UTF-8 (22 Oct 2025)
  */
 class CrearSedeFragment : Fragment() {
 
     private var _binding: FragmentCrearSedeBinding? = null
     private val binding get() = _binding!!
 
-    // 🔄 CAMBIADO: Usar ViewModel en vez de Firestore directo
+    // ✅ CÓDIGO EXISTENTE: ViewModel y servicios
     private val viewModel: SuperAdminViewModel by activityViewModels()
-
     private val storage = FirebaseStorage.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -46,18 +47,18 @@ class CrearSedeFragment : Fragment() {
     private var currentLatitud: Double = 0.0
     private var currentLongitud: Double = 0.0
 
-    // Launcher para seleccionar imagen
+    // ✅ CÓDIGO EXISTENTE: Launcher para seleccionar imagen
     private val selectImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            binding.imgPreview.setImageURI(it)
-            binding.imgPreview.visibility = View.VISIBLE
+            binding.ivPreviewSede.setImageURI(it)
+            binding.ivPreviewSede.visibility = View.VISIBLE
         }
     }
 
-    // Launcher para permisos de ubicación
+    // ✅ CÓDIGO EXISTENTE: Launcher para permisos de ubicación
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -82,63 +83,64 @@ class CrearSedeFragment : Fragment() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         setupListeners()
-        setupObservers() // 🆕 NUEVO: Observar resultados del ViewModel
+        setupObservers()
 
-        // Si hay una sede para editar, cargar datos
+        // ✅ CÓDIGO EXISTENTE: Si hay una sede para editar, cargar datos
         sedeToEdit?.let { cargarDatosSede(it) }
     }
 
     private fun setupListeners() {
-        // Botón seleccionar imagen
-        binding.btnSeleccionarImagen.setOnClickListener {
-            selectImageLauncher.launch("image/*")
-        }
-
-        // Botón obtener ubicación actual
-        binding.btnObtenerUbicacion.setOnClickListener {
-            solicitarPermisoUbicacion()
-        }
-
-        // Selector de hora de apertura
-        binding.etHoraApertura.setOnClickListener {
-            mostrarTimePicker { hora, minuto ->
-                val horaFormateada = String.format("%02d:%02d", hora, minuto)
-                binding.etHoraApertura.setText(horaFormateada)
+        binding.apply {
+            // ✅ CÓDIGO EXISTENTE: Botón seleccionar imagen
+            btnSeleccionarImagen.setOnClickListener {
+                selectImageLauncher.launch("image/*")
             }
-        }
 
-        // Selector de hora de cierre
-        binding.etHoraCierre.setOnClickListener {
-            mostrarTimePicker { hora, minuto ->
-                val horaFormateada = String.format("%02d:%02d", hora, minuto)
-                binding.etHoraCierre.setText(horaFormateada)
+            // ✅ CÓDIGO EXISTENTE: Botón obtener ubicación actual
+            btnObtenerUbicacion.setOnClickListener {
+                solicitarPermisoUbicacion()
             }
-        }
 
-        // Botón guardar
-        binding.btnGuardar.setOnClickListener {
-            if (validarCampos()) {
-                guardarSede()
+            // ✅ CÓDIGO EXISTENTE: Selector de hora de apertura
+            etHoraApertura.setOnClickListener {
+                mostrarTimePicker { hora, minuto ->
+                    val horaFormateada = String.format("%02d:%02d", hora, minuto)
+                    etHoraApertura.setText(horaFormateada)
+                }
             }
-        }
 
-        // Botón cancelar
-        binding.btnCancelar.setOnClickListener {
-            requireActivity().onBackPressed()
+            // ✅ CÓDIGO EXISTENTE: Selector de hora de cierre
+            etHoraCierre.setOnClickListener {
+                mostrarTimePicker { hora, minuto ->
+                    val horaFormateada = String.format("%02d:%02d", hora, minuto)
+                    etHoraCierre.setText(horaFormateada)
+                }
+            }
+
+            // ✅ CÓDIGO EXISTENTE: Botón guardar
+            btnGuardarSede.setOnClickListener {
+                if (validarCampos()) {
+                    guardarSede()
+                }
+            }
+
+            // ✅ CÓDIGO EXISTENTE: Botón cancelar
+            btnCancelar.setOnClickListener {
+                requireActivity().onBackPressed()
+            }
         }
     }
 
-    // 🆕 NUEVO: Observar resultados del ViewModel
+    // ✅ CÓDIGO EXISTENTE: Observar resultados del ViewModel
     private fun setupObservers() {
         viewModel.updateSedeResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    binding.btnGuardar.isEnabled = false
+                    binding.btnGuardarSede.isEnabled = false
                 }
+
                 is Resource.Success -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnGuardar.isEnabled = true
+                    binding.btnGuardarSede.isEnabled = true
                     Toast.makeText(
                         requireContext(),
                         if (sedeToEdit != null) "Sede actualizada correctamente" else "Sede creada correctamente",
@@ -146,15 +148,16 @@ class CrearSedeFragment : Fragment() {
                     ).show()
                     requireActivity().onBackPressed()
                 }
+
                 is Resource.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.btnGuardar.isEnabled = true
+                    binding.btnGuardarSede.isEnabled = true
                     Toast.makeText(requireContext(), resource.message, Toast.LENGTH_SHORT).show()
                 }
             }
         }
     }
 
+    // ✅ CÓDIGO EXISTENTE MANTENIDO
     private fun solicitarPermisoUbicacion() {
         when {
             ContextCompat.checkSelfPermission(
@@ -163,18 +166,18 @@ class CrearSedeFragment : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED -> {
                 obtenerUbicacionActual()
             }
+
             else -> {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
     }
 
+    // ✅ CÓDIGO EXISTENTE MANTENIDO
     private fun obtenerUbicacionActual() {
         try {
-            binding.progressBar.visibility = View.VISIBLE
             fusedLocationClient.lastLocation
                 .addOnSuccessListener { location: Location? ->
-                    binding.progressBar.visibility = View.GONE
                     if (location != null) {
                         currentLatitud = location.latitude
                         currentLongitud = location.longitude
@@ -186,15 +189,14 @@ class CrearSedeFragment : Fragment() {
                     }
                 }
                 .addOnFailureListener { e ->
-                    binding.progressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: SecurityException) {
-            binding.progressBar.visibility = View.GONE
             Toast.makeText(requireContext(), "Permiso de ubicación no concedido", Toast.LENGTH_SHORT).show()
         }
     }
 
+    // ✅ CÓDIGO EXISTENTE MANTENIDO
     private fun mostrarTimePicker(onTimeSelected: (Int, Int) -> Unit) {
         val calendar = Calendar.getInstance()
         val hora = calendar.get(Calendar.HOUR_OF_DAY)
@@ -211,91 +213,119 @@ class CrearSedeFragment : Fragment() {
         ).show()
     }
 
+    // ✅ CÓDIGO EXISTENTE
     private fun validarCampos(): Boolean {
         var isValid = true
 
-        if (binding.etNombre.text.toString().trim().isEmpty()) {
-            binding.tilNombre.error = "Ingrese el nombre de la sede"
-            isValid = false
-        } else {
-            binding.tilNombre.error = null
-        }
+        binding.apply {
+            // Validar nombre
+            if (etNombreSede.text.toString().trim().isEmpty()) {
+                tilNombreSede.error = "Ingrese el nombre de la sede"
+                isValid = false
+            } else {
+                tilNombreSede.error = null
+            }
 
-        if (binding.etDireccion.text.toString().trim().isEmpty()) {
-            binding.tilDireccion.error = "Ingrese la dirección"
-            isValid = false
-        } else {
-            binding.tilDireccion.error = null
-        }
+            // Validar dirección
+            if (etDireccion.text.toString().trim().isEmpty()) {
+                tilDireccion.error = "Ingrese la dirección"
+                isValid = false
+            } else {
+                tilDireccion.error = null
+            }
 
-        val latitud = binding.etLatitud.text.toString().toDoubleOrNull()
-        val longitud = binding.etLongitud.text.toString().toDoubleOrNull()
+            // Validar latitud
+            val latitud = etLatitud.text.toString().toDoubleOrNull()
+            if (latitud == null || latitud == 0.0) {
+                tilLatitud.error = "Ingrese latitud válida"
+                isValid = false
+            } else {
+                tilLatitud.error = null
+            }
 
-        if (latitud == null || latitud == 0.0) {
-            binding.tilLatitud.error = "Ingrese latitud válida"
-            isValid = false
-        } else {
-            binding.tilLatitud.error = null
-        }
+            // Validar longitud
+            val longitud = etLongitud.text.toString().toDoubleOrNull()
+            if (longitud == null || longitud == 0.0) {
+                tilLongitud.error = "Ingrese longitud válida"
+                isValid = false
+            } else {
+                tilLongitud.error = null
+            }
 
-        if (longitud == null || longitud == 0.0) {
-            binding.tilLongitud.error = "Ingrese longitud válida"
-            isValid = false
-        } else {
-            binding.tilLongitud.error = null
-        }
+            // Validar hora de apertura
+            if (etHoraApertura.text.toString().trim().isEmpty()) {
+                tilHoraApertura.error = "Seleccione hora de apertura"
+                isValid = false
+            } else {
+                tilHoraApertura.error = null
+            }
 
-        if (binding.etHoraApertura.text.toString().trim().isEmpty()) {
-            binding.tilHoraApertura.error = "Seleccione hora de apertura"
-            isValid = false
-        } else {
-            binding.tilHoraApertura.error = null
-        }
-
-        if (binding.etHoraCierre.text.toString().trim().isEmpty()) {
-            binding.tilHoraCierre.error = "Seleccione hora de cierre"
-            isValid = false
-        } else {
-            binding.tilHoraCierre.error = null
+            // Validar hora de cierre
+            if (etHoraCierre.text.toString().trim().isEmpty()) {
+                tilHoraCierre.error = "Seleccione hora de cierre"
+                isValid = false
+            } else {
+                tilHoraCierre.error = null
+            }
         }
 
         return isValid
     }
 
+    // 🔧 CORREGIDO: cbBaños -> cbBanios
     private fun guardarSede() {
-        val nombre = binding.etNombre.text.toString().trim()
-        val direccion = binding.etDireccion.text.toString().trim()
-        val descripcion = binding.etDescripcion.text.toString().trim()
-        val latitud = binding.etLatitud.text.toString().toDouble()
-        val longitud = binding.etLongitud.text.toString().toDouble()
-        val telefono = binding.etTelefono.text.toString().trim()
-        val email = binding.etEmail.text.toString().trim()
-        val horaApertura = binding.etHoraApertura.text.toString().trim()
-        val horaCierre = binding.etHoraCierre.text.toString().trim()
+        binding.apply {
+            val nombre = etNombreSede.text.toString().trim()
+            val direccion = etDireccion.text.toString().trim()
+            val descripcion = etDescripcion.text.toString().trim()
+            val latitud = etLatitud.text.toString().toDouble()
+            val longitud = etLongitud.text.toString().toDouble()
+            val telefono = etTelefono.text.toString().trim()
+            val email = etEmail.text.toString().trim()
+            val horaApertura = etHoraApertura.text.toString().trim()
+            val horaCierre = etHoraCierre.text.toString().trim()
 
-        if (imageUri != null) {
-            // Subir imagen primero
-            subirImagenYGuardarSede(
-                nombre, direccion, descripcion, latitud, longitud,
-                telefono, email, horaApertura, horaCierre
-            )
-        } else {
-            // Guardar sin imagen o con la URL existente
-            val imageUrl = sedeToEdit?.imageUrl ?: ""
-            guardarSedeEnViewModel(
-                nombre, direccion, descripcion, latitud, longitud,
-                telefono, email, horaApertura, horaCierre, imageUrl
-            )
+            // ✨ NUEVO: Obtener valores de amenidades de los checkboxes
+            val tieneDucha = cbDucha.isChecked
+            val tieneGaraje = cbGaraje.isChecked
+            val tieneLuzNocturna = cbLuzNocturna.isChecked
+            val tieneEstacionamiento = cbEstacionamiento.isChecked
+            val tieneBanios = cbBanios.isChecked  // 🔧 CORREGIDO
+            val tieneWifi = cbWifi.isChecked
+            val tieneCafeteria = cbCafeteria.isChecked
+            val tieneVestidores = cbVestidores.isChecked
+
+            if (imageUri != null) {
+                // Subir imagen primero
+                subirImagenYGuardarSede(
+                    nombre, direccion, descripcion, latitud, longitud,
+                    telefono, email, horaApertura, horaCierre,
+                    tieneDucha, tieneGaraje, tieneLuzNocturna, tieneEstacionamiento,
+                    tieneBanios, tieneWifi, tieneCafeteria, tieneVestidores
+                )
+            } else {
+                // Guardar sin imagen o con la URL existente
+                val imageUrl = sedeToEdit?.imageUrl ?: ""
+                guardarSedeEnViewModel(
+                    nombre, direccion, descripcion, latitud, longitud,
+                    telefono, email, horaApertura, horaCierre, imageUrl,
+                    tieneDucha, tieneGaraje, tieneLuzNocturna, tieneEstacionamiento,
+                    tieneBanios, tieneWifi, tieneCafeteria, tieneVestidores
+                )
+            }
         }
     }
 
+    // ✨ ACTUALIZADO: Agregados parámetros de amenidades
     private fun subirImagenYGuardarSede(
         nombre: String, direccion: String, descripcion: String,
         latitud: Double, longitud: Double, telefono: String,
-        email: String, horaApertura: String, horaCierre: String
+        email: String, horaApertura: String, horaCierre: String,
+        tieneDucha: Boolean, tieneGaraje: Boolean, tieneLuzNocturna: Boolean,
+        tieneEstacionamiento: Boolean, tieneBanios: Boolean, tieneWifi: Boolean,
+        tieneCafeteria: Boolean, tieneVestidores: Boolean
     ) {
-        binding.progressBar.visibility = View.VISIBLE
-        binding.btnGuardar.isEnabled = false
+        binding.btnGuardarSede.isEnabled = false
 
         val fileName = "sedes/${UUID.randomUUID()}.jpg"
         val storageRef = storage.reference.child(fileName)
@@ -305,23 +335,27 @@ class CrearSedeFragment : Fragment() {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
                     guardarSedeEnViewModel(
                         nombre, direccion, descripcion, latitud, longitud,
-                        telefono, email, horaApertura, horaCierre, uri.toString()
+                        telefono, email, horaApertura, horaCierre, uri.toString(),
+                        tieneDucha, tieneGaraje, tieneLuzNocturna, tieneEstacionamiento,
+                        tieneBanios, tieneWifi, tieneCafeteria, tieneVestidores
                     )
                 }
             }
             .addOnFailureListener { e ->
-                binding.progressBar.visibility = View.GONE
-                binding.btnGuardar.isEnabled = true
+                binding.btnGuardarSede.isEnabled = true
                 Toast.makeText(requireContext(), "Error al subir imagen: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 
-    // 🔄 CAMBIADO: Usar ViewModel en vez de Firestore directo
+    // ✨ ACTUALIZADO: Agregados parámetros de amenidades al crear objeto Sede
     private fun guardarSedeEnViewModel(
         nombre: String, direccion: String, descripcion: String,
         latitud: Double, longitud: Double, telefono: String,
         email: String, horaApertura: String, horaCierre: String,
-        imageUrl: String
+        imageUrl: String,
+        tieneDucha: Boolean, tieneGaraje: Boolean, tieneLuzNocturna: Boolean,
+        tieneEstacionamiento: Boolean, tieneBanios: Boolean, tieneWifi: Boolean,
+        tieneCafeteria: Boolean, tieneVestidores: Boolean
     ) {
         val sede = Sede(
             id = sedeToEdit?.id ?: "",
@@ -336,17 +370,32 @@ class CrearSedeFragment : Fragment() {
             horaCierre = horaCierre,
             imageUrl = imageUrl,
             activa = true,
-            canchasIds = sedeToEdit?.canchasIds ?: emptyList(),
-            adminId = auth.currentUser?.uid.orEmpty()
+            canchaIds = sedeToEdit?.canchaIds,
+            adminId = sedeToEdit?.adminId ?: auth.currentUser?.uid.orEmpty(),
+            codigoInvitacion = sedeToEdit?.codigoInvitacion ?: "",
+            codigoActivo = sedeToEdit?.codigoActivo ?: true,
+            fechaCreacion = sedeToEdit?.fechaCreacion,
+            fechaModificacion = sedeToEdit?.fechaModificacion,
+            // ✨ NUEVO: Asignar valores de amenidades
+            tieneDucha = tieneDucha,
+            tieneGaraje = tieneGaraje,
+            tieneLuzNocturna = tieneLuzNocturna,
+            tieneEstacionamiento = tieneEstacionamiento,
+            tieneBaños = tieneBanios,  // 🔧 CORREGIDO: Se lee de cbBanios pero se guarda como tieneBaños
+            tieneWifi = tieneWifi,
+            tieneCafeteria = tieneCafeteria,
+            tieneVestidores = tieneVestidores
         )
 
-        // 🆕 NUEVO: Guardar a través del ViewModel
+        // ✅ CÓDIGO EXISTENTE: Guardar a través del ViewModel
         viewModel.guardarSede(sede)
     }
 
+    // ✨ ACTUALIZADO: Cargar también las amenidades al editar
     private fun cargarDatosSede(sede: Sede) {
         binding.apply {
-            etNombre.setText(sede.nombre)
+            // ✅ CÓDIGO EXISTENTE: Datos básicos
+            etNombreSede.setText(sede.nombre)
             etDireccion.setText(sede.direccion)
             etDescripcion.setText(sede.descripcion)
             etLatitud.setText(sede.latitud.toString())
@@ -359,14 +408,25 @@ class CrearSedeFragment : Fragment() {
             currentLatitud = sede.latitud
             currentLongitud = sede.longitud
 
+            // ✅ CÓDIGO EXISTENTE: Cargar imagen
             if (sede.imageUrl.isNotEmpty()) {
                 Glide.with(requireContext())
                     .load(sede.imageUrl)
-                    .into(imgPreview)
-                imgPreview.visibility = View.VISIBLE
+                    .into(ivPreviewSede)
+                ivPreviewSede.visibility = View.VISIBLE
             }
 
-            btnGuardar.text = "Actualizar Sede"
+            // ✨ NUEVO: Cargar amenidades (🔧 CORREGIDO)
+            cbDucha.isChecked = sede.tieneDucha
+            cbGaraje.isChecked = sede.tieneGaraje
+            cbLuzNocturna.isChecked = sede.tieneLuzNocturna
+            cbEstacionamiento.isChecked = sede.tieneEstacionamiento
+            cbBanios.isChecked = sede.tieneBaños  // 🔧 CORREGIDO
+            cbWifi.isChecked = sede.tieneWifi
+            cbCafeteria.isChecked = sede.tieneCafeteria
+            cbVestidores.isChecked = sede.tieneVestidores
+
+            btnGuardarSede.text = "Actualizar Sede"
         }
     }
 

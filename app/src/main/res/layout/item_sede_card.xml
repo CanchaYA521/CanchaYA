@@ -1,127 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 🆕 NUEVO: Card de sede (21 Oct 2025) -->
-<com.google.android.material.card.MaterialCardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- ✨ ACTUALIZADO: Diseño compacto tipo lista con expansión (22 Oct 2025) -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardSede"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
+    android:clickable="true"
+    android:focusable="true"
     app:cardCornerRadius="12dp"
-    app:cardElevation="4dp"
-    app:strokeWidth="0dp">
+    app:cardElevation="2dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="#E0E0E0">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Imagen de la sede -->
-        <ImageView
-            android:id="@+id/imgSede"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Imagen de la sede"
-            tools:src="@drawable/ic_placeholder_cancha" />
-
-        <!-- Contenido principal -->
-        <LinearLayout
+        <!-- ✨ NUEVA: Sección principal compacta (siempre visible) -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/layoutPrincipal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="12dp">
 
-            <!-- Header: Nombre y Estado -->
+            <!-- Imagen de la sede (pequeña, a la izquierda) -->
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/ivSede"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_sede_placeholder"
+                app:shapeAppearanceOverlay="@style/RoundedImageView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <!-- Contenido de texto -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:id="@+id/layoutTexto"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:orientation="vertical"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintStart_toEndOf="@id/ivSede"
+                app:layout_constraintEnd_toStartOf="@id/iconExpand"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
 
+                <!-- Nombre de la sede -->
                 <TextView
                     android:id="@+id/tvNombreSede"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="18sp"
+                    android:text="Sede Principal"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="#212121"
-                    tools:text="Sede Central" />
+                    android:textColor="@color/black"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipEstado"
-                    android:layout_width="wrap_content"
+                <!-- Dirección -->
+                <TextView
+                    android:id="@+id/tvDireccion"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Activa"
-                    android:textColor="@android:color/white"
-                    app:chipBackgroundColor="@color/success"
-                    app:chipCornerRadius="16dp"
-                    android:textSize="12sp" />
+                    android:text="Av. Principal 123"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_secondary"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:layout_marginTop="2dp"
+                    android:drawablePadding="4dp"
+                    app:drawableStartCompat="@drawable/ic_location"
+                    app:drawableTint="@color/text_secondary" />
+
+                <!-- Horario -->
+                <TextView
+                    android:id="@+id/tvHorario"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="⏰ 06:00 - 23:00"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_secondary"
+                    android:maxLines="1"
+                    android:layout_marginTop="2dp" />
 
             </LinearLayout>
 
-            <!-- Dirección -->
-            <TextView
-                android:id="@+id/tvDireccion"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textSize="14sp"
-                android:textColor="#616161"
-                android:drawablePadding="4dp"
-                tools:text="Jr. San Fernando 1234, Nueva Cajamarca" />
+            <!-- Icono de expandir/contraer -->
+            <ImageView
+                android:id="@+id/iconExpand"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_expand_more"
+                android:tint="@color/text_secondary"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
-            <!-- Horario -->
-            <TextView
-                android:id="@+id/tvHorario"
-                android:layout_width="match_parent"
+            <!-- Badge de estado (activa/inactiva) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/badgeEstado"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
                 android:layout_marginTop="4dp"
-                android:textSize="14sp"
-                android:textColor="#757575"
-                tools:text="⏰ 06:00 - 23:00" />
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Coordenadas -->
-            <TextView
-                android:id="@+id/tvCoordenadas"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="12sp"
-                android:textColor="#9E9E9E"
-                tools:text="📍 -5.1234, -78.5678" />
+                <TextView
+                    android:id="@+id/tvEstado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Activa"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="2dp"
+                    android:textColor="@android:color/white" />
 
-            <!-- Divider -->
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- ✨ NUEVA: Sección expandible con opciones (oculta por defecto) -->
+        <LinearLayout
+            android:id="@+id/layoutOpciones"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:background="#F5F5F5"
+            android:padding="8dp"
+            tools:visibility="visible">
+
+            <!-- Divisor -->
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="12dp"
-                android:layout_marginBottom="12dp"
-                android:background="#E0E0E0" />
+                android:background="#E0E0E0"
+                android:layout_marginBottom="8dp" />
 
             <!-- Información adicional -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="8dp">
 
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_sports_soccer"
-                    app:tint="@color/primary" />
-
+                <!-- Número de canchas -->
                 <TextView
-                    android:id="@+id/tvCantidadCanchas"
+                    android:id="@+id/tvNumCanchas"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="🏟️ 0 canchas"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_secondary" />
+
+                <!-- Teléfono -->
+                <TextView
+                    android:id="@+id/tvTelefono"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/primary"
-                    tools:text="5 canchas" />
+                    android:text="📞 919020325"
+                    android:textSize="13sp"
+                    android:textColor="@color/text_secondary" />
 
             </LinearLayout>
 
@@ -129,65 +178,54 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:orientation="horizontal"
-                android:gravity="center">
+                android:gravity="end">
 
+                <!-- Botón Ver Canchas -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnVerCanchas"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
                     android:text="Ver Canchas"
                     android:textSize="12sp"
-                    app:icon="@drawable/ic_sports_soccer"
-                    app:iconSize="16dp" />
+                    app:icon="@drawable/ic_stadium"
+                    app:iconSize="16dp"
+                    android:layout_marginEnd="4dp" />
 
+                <!-- Botón Agregar Cancha -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAgregarCancha"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
                     android:text="+ Cancha"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_add"
-                    app:iconSize="16dp" />
+                    app:iconSize="16dp"
+                    android:layout_marginEnd="4dp" />
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:orientation="horizontal"
-                android:gravity="center">
-
+                <!-- Botón Editar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEditar"
                     style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
                     android:text="Editar"
                     android:textSize="12sp"
                     app:icon="@drawable/ic_edit"
-                    app:iconSize="16dp" />
+                    app:iconSize="16dp"
+                    app:iconTint="@color/primary"
+                    android:layout_marginEnd="4dp" />
 
+                <!-- Botón Eliminar -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEliminar"
                     style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_marginStart="4dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
                     android:text="Eliminar"
                     android:textSize="12sp"
-                    android:textColor="@color/error"
                     app:icon="@drawable/ic_delete"
                     app:iconSize="16dp"
                     app:iconTint="@color/error" />

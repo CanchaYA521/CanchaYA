@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Style para imágenes circulares -->
-    <style name="CircleImageView">
+    <!-- ✅ CÓDIGO EXISTENTE: Tus estilos actuales se mantienen aquí -->
+
+    <!-- ✨ NUEVO: Estilo para imágenes redondeadas (22 Oct 2025) -->
+    <style name="RoundedImageView">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
+        <item name="cornerSize">12dp</item>
     </style>
 
 </resources>

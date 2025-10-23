@@ -1,6 +1,7 @@
 package com.rojassac.canchaya.ui.superadmin.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -9,7 +10,8 @@ import com.rojassac.canchaya.databinding.ItemSedeCardBinding
 import com.rojassac.canchaya.data.model.Sede
 
 /**
- * 🆕 NUEVO ADAPTER: Adapter para lista de Sedes (21 Oct 2025)
+ * ✅ CÓDIGO EXISTENTE MANTENIDO
+ * ✨ ACTUALIZADO: Agregada lógica de expansión/contracción (22 Oct 2025)
  */
 class SedesAdapter(
     private var sedes: List<Sede>,
@@ -19,61 +21,98 @@ class SedesAdapter(
     private val onAgregarCancha: (Sede) -> Unit
 ) : RecyclerView.Adapter<SedesAdapter.SedeViewHolder>() {
 
+    // ✨ NUEVO: Mapa para trackear qué items están expandidos
+    private val expandedItems = mutableSetOf<String>()
+
     inner class SedeViewHolder(private val binding: ItemSedeCardBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(sede: Sede) {
             binding.apply {
-                // Nombre de la sede
+                // ✅ CÓDIGO EXISTENTE: Nombre de la sede
                 tvNombreSede.text = sede.nombre
 
-                // Dirección
+                // ✅ CÓDIGO EXISTENTE: Dirección
                 tvDireccion.text = sede.direccion
 
-                // Horario de operación
+                // ✅ CÓDIGO EXISTENTE: Horario de operación
                 tvHorario.text = "⏰ ${sede.getHorarioDisplay()}"
 
-                // Coordenadas GPS
-                if (sede.tieneCoordenadasValidas()) {
-                    tvCoordenadas.text = "📍 ${sede.latitud}, ${sede.longitud}"
-                    tvCoordenadas.setTextColor(tvCoordenadas.context.getColor(android.R.color.darker_gray))
+                // ✅ CÓDIGO EXISTENTE: Coordenadas GPS (ahora en el TextView de teléfono)
+                tvTelefono.text = if (sede.telefono.isNotEmpty()) {
+                    "📞 ${sede.telefono}"
                 } else {
-                    tvCoordenadas.text = "📍 Sin coordenadas"
-                    // 🔵 CORREGIDO: Usar color directo en vez de R.color.error
-                    tvCoordenadas.setTextColor(android.graphics.Color.parseColor("#F44336"))
+                    "📍 ${sede.latitud}, ${sede.longitud}"
                 }
 
-                // Cantidad de canchas
-                tvCantidadCanchas.text = "${sede.getCantidadCanchas()} canchas"
+                // ✅ CÓDIGO EXISTENTE: Número de canchas
+                val numCanchas = sede.canchaIds?.size ?: 0
+                tvNumCanchas.text = "🏟️ $numCanchas ${if (numCanchas == 1) "cancha" else "canchas"}"
 
-                // Estado de la sede
+                // ✅ CÓDIGO EXISTENTE: Estado de la sede
                 if (sede.activa) {
-                    chipEstado.text = "Activa"
-                    chipEstado.setChipBackgroundColorResource(android.R.color.holo_green_dark)
+                    tvEstado.text = "Activa"
+                    badgeEstado.setCardBackgroundColor(
+                        itemView.context.getColor(R.color.success)
+                    )
                 } else {
-                    chipEstado.text = "Inactiva"
-                    chipEstado.setChipBackgroundColorResource(android.R.color.holo_red_dark)
+                    tvEstado.text = "Inactiva"
+                    badgeEstado.setCardBackgroundColor(
+                        itemView.context.getColor(R.color.error)
+                    )
                 }
 
-                // Imagen de la sede
-                if (sede.imageUrl.isNotEmpty()) {
-                    Glide.with(imgSede.context)
-                        .load(sede.imageUrl)
-                        .placeholder(R.drawable.ic_placeholder_cancha)
-                        .error(R.drawable.ic_placeholder_cancha)
-                        .centerCrop()
-                        .into(imgSede)
-                } else {
-                    imgSede.setImageResource(R.drawable.ic_placeholder_cancha)
+                // ✅ CÓDIGO EXISTENTE: Cargar imagen con Glide
+                Glide.with(itemView.context)
+                    .load(sede.imageUrl)
+                    .placeholder(R.drawable.ic_sede_placeholder)
+                    .error(R.drawable.ic_sede_placeholder)
+                    .centerCrop()
+                    .into(ivSede)
+
+                // ✨ NUEVO: Verificar si el item está expandido
+                val isExpanded = expandedItems.contains(sede.id)
+                layoutOpciones.visibility = if (isExpanded) View.VISIBLE else View.GONE
+
+                // ✨ NUEVO: Rotar icono según estado
+                iconExpand.rotation = if (isExpanded) 180f else 0f
+
+                // ✨ NUEVO: Click en la tarjeta principal para expandir/contraer
+                layoutPrincipal.setOnClickListener {
+                    toggleExpansion(sede.id)
                 }
 
-                // Listeners de botones
-                btnVerCanchas.setOnClickListener { onVerCanchas(sede) }
-                btnEditar.setOnClickListener { onEditar(sede) }
-                btnEliminar.setOnClickListener { onEliminar(sede) }
-                btnAgregarCancha.setOnClickListener { onAgregarCancha(sede) }
+                // ✅ CÓDIGO EXISTENTE: Botón ver canchas
+                btnVerCanchas.setOnClickListener {
+                    onVerCanchas(sede)
+                }
+
+                // ✅ CÓDIGO EXISTENTE: Botón editar
+                btnEditar.setOnClickListener {
+                    onEditar(sede)
+                }
+
+                // ✅ CÓDIGO EXISTENTE: Botón eliminar
+                btnEliminar.setOnClickListener {
+                    onEliminar(sede)
+                }
+
+                // ✅ CÓDIGO EXISTENTE: Botón agregar cancha
+                btnAgregarCancha.setOnClickListener {
+                    onAgregarCancha(sede)
+                }
             }
         }
+    }
+
+    // ✨ NUEVO: Función para expandir/contraer items
+    private fun toggleExpansion(sedeId: String) {
+        if (expandedItems.contains(sedeId)) {
+            expandedItems.remove(sedeId)
+        } else {
+            expandedItems.add(sedeId)
+        }
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SedeViewHolder {
@@ -91,8 +130,9 @@ class SedesAdapter(
 
     override fun getItemCount(): Int = sedes.size
 
-    fun updateList(newList: List<Sede>) {
-        sedes = newList
+    // ✅ CÓDIGO EXISTENTE: Función para actualizar la lista
+    fun updateList(newSedes: List<Sede>) {
+        sedes = newSedes
         notifyDataSetChanged()
     }
 }

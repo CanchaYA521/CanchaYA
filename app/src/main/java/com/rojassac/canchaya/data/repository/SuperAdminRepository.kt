@@ -40,7 +40,7 @@ class SuperAdminRepository {
                         },
                         activo = doc.getBoolean("activo") ?: true,
                         canchaId = doc.getString("canchaId"),
-                        canchasAsignadas = (doc.get("canchasAsignadas") as? List<String>) ?: emptyList(),
+                        canchasAsignadas = (doc.get("canchasAsignadas") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         sedeId = doc.getString("sedeId"),
                         tipoAdministracion = doc.getString("tipoAdministracion"),
                         fechaCreacion = doc.getLong("fechaCreacion") ?: System.currentTimeMillis(),
@@ -50,6 +50,7 @@ class SuperAdminRepository {
                     null
                 }
             }
+
             Result.success(users)
         } catch (e: Exception) {
             Result.failure(e)
@@ -107,6 +108,7 @@ class SuperAdminRepository {
             val admins = snapshot.documents.count { doc ->
                 doc.getString("rol") == UserRole.ADMIN.name
             }
+
             val activeUsers = snapshot.documents.count { doc ->
                 doc.getBoolean("activo") == true
             }
@@ -138,6 +140,7 @@ class SuperAdminRepository {
                     null
                 }
             }
+
             Result.success(canchas)
         } catch (e: Exception) {
             Result.failure(e)
@@ -214,7 +217,6 @@ class SuperAdminRepository {
 
             // Generar código: SE00000001
             val codigo = String.format("SE%08d", nuevoContador)
-
             Log.d("SuperAdminRepo", "✅ Código generado: $codigo")
             codigo
 
@@ -242,6 +244,7 @@ class SuperAdminRepository {
                     null
                 }
             }
+
             Result.success(sedes)
         } catch (e: Exception) {
             Result.failure(e)
@@ -250,14 +253,14 @@ class SuperAdminRepository {
 
     /**
      * 🔵 MODIFICADO: Crear sede con código secuencial (22 Oct 2025)
-     * ELIMINADO: Creación de colección codigos_invitacion (duplicado)
+     * 🔧 CORREGIDO: canchasIds -> canchaIds (22 Oct 2025)
      */
     suspend fun crearSede(sede: Sede): Result<String> {
         return try {
             // 1. 🔵 MODIFICADO: Generar código único secuencial
             val codigoInvitacion = generarCodigoInvitacion("sede")
 
-            // 2. Crear datos de la sede
+            // 2. Crear datos de la sede (🔧 CORREGIDO: canchasIds -> canchaIds)
             val sedeData = hashMapOf(
                 "nombre" to sede.nombre,
                 "direccion" to sede.direccion,
@@ -270,12 +273,21 @@ class SuperAdminRepository {
                 "horaCierre" to sede.horaCierre,
                 "imageUrl" to sede.imageUrl,
                 "activa" to sede.activa,
-                "canchasIds" to sede.canchasIds,
-                "adminId" to "",                          // Sin admin asignado
-                "codigoInvitacion" to codigoInvitacion,  // Código único
-                "codigoUsado" to false,                   // Disponible para uso
+                "canchaIds" to sede.canchaIds,  // 🔧 CORREGIDO: era "canchasIds"
+                "adminId" to "", // Sin admin asignado
+                "codigoInvitacion" to codigoInvitacion, // Código único
+                "codigoActivo" to true, // Código activo
                 "fechaCreacion" to com.google.firebase.Timestamp.now(),
-                "fechaActualizacion" to com.google.firebase.Timestamp.now()
+                "fechaModificacion" to com.google.firebase.Timestamp.now(),
+                // ✨ NUEVO: Agregar amenidades (22 Oct 2025)
+                "tieneDucha" to sede.tieneDucha,
+                "tieneGaraje" to sede.tieneGaraje,
+                "tieneLuzNocturna" to sede.tieneLuzNocturna,
+                "tieneEstacionamiento" to sede.tieneEstacionamiento,
+                "tieneBaños" to sede.tieneBaños,
+                "tieneWifi" to sede.tieneWifi,
+                "tieneCafeteria" to sede.tieneCafeteria,
+                "tieneVestidores" to sede.tieneVestidores
             )
 
             // 3. Guardar sede en Firestore
@@ -285,12 +297,9 @@ class SuperAdminRepository {
 
             val sedeId = docRef.id
 
-            // 🗑️ ELIMINADO: Ya NO creamos documento en codigos_invitacion
-            // El código está directamente en la sede
-
             Log.d("SuperAdminRepo", "✅ Sede creada: $sedeId con código: $codigoInvitacion")
-
             Result.success(sedeId)
+
         } catch (e: Exception) {
             Log.e("SuperAdminRepo", "❌ Error al crear sede: ${e.message}", e)
             Result.failure(e)
@@ -299,6 +308,7 @@ class SuperAdminRepository {
 
     /**
      * ✅ CÓDIGO EXISTENTE - NO MODIFICADO
+     * 🔧 CORREGIDO: canchasIds -> canchaIds (22 Oct 2025)
      */
     suspend fun actualizarSede(sede: Sede): Result<Unit> {
         return try {
@@ -314,9 +324,18 @@ class SuperAdminRepository {
                 "horaCierre" to sede.horaCierre,
                 "imageUrl" to sede.imageUrl,
                 "activa" to sede.activa,
-                "canchasIds" to sede.canchasIds,
+                "canchaIds" to sede.canchaIds,  // 🔧 CORREGIDO: era "canchasIds"
                 "adminId" to sede.adminId,
-                "fechaActualizacion" to com.google.firebase.Timestamp.now()
+                "fechaModificacion" to com.google.firebase.Timestamp.now(),
+                // ✨ NUEVO: Agregar amenidades (22 Oct 2025)
+                "tieneDucha" to sede.tieneDucha,
+                "tieneGaraje" to sede.tieneGaraje,
+                "tieneLuzNocturna" to sede.tieneLuzNocturna,
+                "tieneEstacionamiento" to sede.tieneEstacionamiento,
+                "tieneBaños" to sede.tieneBaños,
+                "tieneWifi" to sede.tieneWifi,
+                "tieneCafeteria" to sede.tieneCafeteria,
+                "tieneVestidores" to sede.tieneVestidores
             )
 
             firestore.collection(Constants.SEDES_COLLECTION)
@@ -395,15 +414,16 @@ class SuperAdminRepository {
                 .document(sedeId)
                 .update(
                     mapOf(
-                        "codigoUsado" to false,
+                        "codigoActivo" to true,
                         "adminId" to "",
-                        "fechaActualizacion" to com.google.firebase.Timestamp.now()
-                    )
+                        "fechaModificacion" to com.google.firebase.Timestamp.now()
+                       )
                 )
                 .await()
 
             Log.d("SuperAdminRepo", "✅ Código reactivado para sede: $sedeId")
             Result.success(Unit)
+
         } catch (e: Exception) {
             Log.e("SuperAdminRepo", "❌ Error al reactivar código: ${e.message}", e)
             Result.failure(e)
