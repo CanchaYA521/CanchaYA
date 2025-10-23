@@ -1,138 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<!-- 🔧 REDISEÑADO: Botón filtro al lado del SearchView (23 Oct 2025) -->
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    tools:context=".ui.superadmin.fragments.UsuariosManagementFragment">
+    android:background="#F5F5F5">
 
-    <!-- Header Card con Título y SearchView -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardHeader"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
+        <!-- Búsqueda + Filtro en fila -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="horizontal"
+            android:layout_margin="12dp"
+            android:gravity="center_vertical">
 
-            <TextView
+            <!-- SearchView -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp">
+
+                <androidx.appcompat.widget.SearchView
+                    android:id="@+id/searchView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:queryHint="Buscar..."
+                    app:iconifiedByDefault="false"
+                    app:queryBackground="@android:color/transparent"/>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Botón Filtro -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFiltro"
+                style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Gestión de Usuarios"
-                android:textColor="@color/primary"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/searchView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="@android:color/white"
-                app:iconifiedByDefault="false"
-                app:queryHint="Buscar por nombre o email..." />
-
+                android:layout_height="56dp"
+                android:text="Filtro"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp"
+                app:icon="@drawable/ic_filter"
+                app:iconSize="20dp"/>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
 
-    <!-- Filtros por Rol (Chips) -->
-    <HorizontalScrollView
-        android:id="@+id/scrollViewChips"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:scrollbars="none"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardHeader">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroup"
+        <!-- Contador de resultados -->
+        <TextView
+            android:id="@+id/tvContador"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="16dp"
-            app:singleSelection="true">
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="13sp"
+            android:textColor="@android:color/darker_gray"
+            android:text="Mostrando 0 usuarios"/>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipTodos"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Todos" />
+        <!-- SwipeRefresh con lista -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipUsuarios"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Usuarios" />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipAdmins"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Admins" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvUsuarios"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingVertical="8dp"/>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipSuperadmins"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="SuperAdmins" />
+                <!-- Estado vacío -->
+                <LinearLayout
+                    android:id="@+id/tvEmptyState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-        </com.google.android.material.chip.ChipGroup>
-    </HorizontalScrollView>
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:src="@drawable/ic_person"
+                        android:alpha="0.3"
+                        app:tint="@android:color/darker_gray"/>
 
-    <!-- ProgressBar -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="No se encontraron usuarios"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/darker_gray"/>
+                </LinearLayout>
 
-    <!-- RecyclerView de Usuarios -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvUsuarios"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:clipToPadding="false"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollViewChips"
-        tools:listitem="@layout/item_usuario" />
-
-    <!-- Estado Vacío -->
-    <TextView
-        android:id="@+id/tvEmptyState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No hay usuarios que mostrar"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="16sp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/scrollViewChips" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
+            </FrameLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

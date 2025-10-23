@@ -133,5 +133,26 @@
     <color name="purple_600">#7B1FA2</color>
     <color name="grey_500">#9E9E9E</color>
     <color name="grey_600">#757575</color>
+    <!-- ✨ NUEVOS COLORES PARA BADGES Y ESTADOS (23 Oct 2025) -->
+
+    <!-- Badges de Roles -->
+    <color name="badge_superadmin_bg">#E1BEE7</color>
+    <color name="badge_superadmin_text">#4A148C</color>
+
+    <color name="badge_admin_bg">#BBDEFB</color>
+    <color name="badge_admin_text">#0D47A1</color>
+
+    <color name="badge_usuario_bg">#C8E6C9</color>
+    <color name="badge_usuario_text">#1B5E20</color>
+
+    <!-- Estados Activo/Inactivo -->
+    <color name="status_active_bg">#C8E6C9</color>
+    <color name="status_active_text">#2E7D32</color>
+
+    <color name="status_inactive_bg">#FFCDD2</color>
+    <color name="status_inactive_text">#C62828</color>
+
+    <!-- Chip Background Selector -->
+    <color name="chip_background_selector">#E0E0E0</color>
 
 </resources>

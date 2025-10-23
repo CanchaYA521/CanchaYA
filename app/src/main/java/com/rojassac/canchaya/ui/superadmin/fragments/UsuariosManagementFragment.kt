@@ -22,6 +22,10 @@ import com.rojassac.canchaya.ui.superadmin.SuperAdminViewModel
 import com.rojassac.canchaya.ui.superadmin.adapters.UsuariosAdapter
 import com.rojassac.canchaya.utils.Resource
 
+/**
+ * ✅ CÓDIGO EXISTENTE MANTENIDO
+ * 🔧 CORREGIDO: Botón filtro agregado (23 Oct 2025)
+ */
 class UsuariosManagementFragment : Fragment() {
 
     private var _binding: FragmentUsuariosManagementBinding? = null
@@ -46,10 +50,10 @@ class UsuariosManagementFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         setupSearchView()
-        setupFilterChips()
+        setupFilterButton() // 🆕 NUEVO
+        setupRefreshLayout() // 🆕 NUEVO
         setupObservers()
 
         // Cargar datos
@@ -57,12 +61,10 @@ class UsuariosManagementFragment : Fragment() {
         viewModel.loadAllCanchas()
     }
 
+    // 🔧 MODIFICADO: Adapter con click
     private fun setupRecyclerView() {
         adapter = UsuariosAdapter(
-            onEditClick = { user -> showEditUserDialog(user) },
-            onToggleStatusClick = { user -> toggleUserStatus(user) },
-            onDeleteClick = { user -> confirmDeleteUser(user) },
-            onAssignCanchaClick = { user -> showAssignCanchaDialog(user) }
+            onUserClick = { user -> showUserOptionsDialog(user) }
         )
 
         binding.rvUsuarios.layoutManager = LinearLayoutManager(requireContext())
@@ -71,45 +73,86 @@ class UsuariosManagementFragment : Fragment() {
 
     private fun setupSearchView() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
-            }
+            override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                filterUsers(newText ?: "")
+                applyFilters(newText ?: "")
                 return true
             }
         })
     }
 
-    private fun setupFilterChips() {
-        binding.chipTodos.setOnClickListener { filterByRole(null) }
-        binding.chipUsuarios.setOnClickListener { filterByRole(UserRole.USUARIO) }
-        binding.chipAdmins.setOnClickListener { filterByRole(UserRole.ADMIN) }
-        binding.chipSuperadmins.setOnClickListener { filterByRole(UserRole.SUPERADMIN) }
+    // 🆕 NUEVO: Botón de filtro
+    private fun setupFilterButton() {
+        binding.btnFiltro.setOnClickListener {
+            showFilterDialog()
+        }
     }
 
-    private fun filterByRole(role: UserRole?) {
-        currentFilterRole = role
-
-        // Actualizar estado de chips
-        binding.chipTodos.isChecked = role == null
-        binding.chipUsuarios.isChecked = role == UserRole.USUARIO
-        binding.chipAdmins.isChecked = role == UserRole.ADMIN
-        binding.chipSuperadmins.isChecked = role == UserRole.SUPERADMIN
-
-        applyFilters()
+    // 🆕 NUEVO: SwipeRefresh
+    private fun setupRefreshLayout() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.loadAllUsers()
+            viewModel.loadAllCanchas()
+        }
     }
 
-    private fun filterUsers(query: String) {
-        applyFilters(query)
+    // 🆕 NUEVO: Diálogo de filtro
+    private fun showFilterDialog() {
+        val options = arrayOf("Todos", "Usuarios", "Admins", "SuperAdmins")
+        val selectedIndex = when (currentFilterRole) {
+            null -> 0
+            UserRole.USUARIO -> 1
+            UserRole.ADMIN -> 2
+            UserRole.SUPERADMIN -> 3
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Filtrar por rol")
+            .setSingleChoiceItems(options, selectedIndex) { dialog, which ->
+                currentFilterRole = when (which) {
+                    0 -> null
+                    1 -> UserRole.USUARIO
+                    2 -> UserRole.ADMIN
+                    3 -> UserRole.SUPERADMIN
+                    else -> null
+                }
+                applyFilters()
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    // 🆕 NUEVO: Diálogo de opciones
+    private fun showUserOptionsDialog(user: User) {
+        val options = mutableListOf("Editar Rol")
+
+        options.add(if (user.activo) "Desactivar" else "Activar")
+
+        if (user.rol == UserRole.ADMIN) {
+            options.add("Asignar Cancha")
+        }
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(user.nombre)
+            .setItems(options.toTypedArray()) { _, which ->
+                when (options[which]) {
+                    "Editar Rol" -> showEditUserDialog(user)
+                    "Desactivar", "Activar" -> toggleUserStatus(user)
+                    "Asignar Cancha" -> showAssignCanchaDialog(user)
+                }
+            }
+            .setNegativeButton("Cerrar", null)
+            .show()
     }
 
     private fun applyFilters(searchQuery: String = binding.searchView.query.toString()) {
         filteredUsers = allUsers.filter { user ->
             val matchesSearch = searchQuery.isEmpty() ||
                     user.nombre.contains(searchQuery, ignoreCase = true) ||
-                    user.email.contains(searchQuery, ignoreCase = true)
+                    user.email.contains(searchQuery, ignoreCase = true) ||
+                    user.celular?.contains(searchQuery) == true
 
             val matchesRole = currentFilterRole == null || user.rol == currentFilterRole
 
@@ -118,6 +161,18 @@ class UsuariosManagementFragment : Fragment() {
 
         adapter.submitList(filteredUsers)
         updateEmptyState()
+        updateCounter()
+    }
+
+    // 🆕 NUEVO: Contador
+    private fun updateCounter() {
+        val filterText = when (currentFilterRole) {
+            null -> "Mostrando ${filteredUsers.size} de ${allUsers.size} usuarios"
+            UserRole.USUARIO -> "Mostrando ${filteredUsers.size} usuarios"
+            UserRole.ADMIN -> "Mostrando ${filteredUsers.size} admins"
+            UserRole.SUPERADMIN -> "Mostrando ${filteredUsers.size} superadmins"
+        }
+        binding.tvContador.text = filterText
     }
 
     private fun updateEmptyState() {
@@ -131,18 +186,18 @@ class UsuariosManagementFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // Observar usuarios
         viewModel.usuarios.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     binding.progressBar.visibility = View.GONE
+                    binding.swipeRefresh.isRefreshing = false
                     allUsers = resource.data ?: emptyList()
                     applyFilters()
-                    updateStats()
                 }
                 is Resource.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    showError("Error al cargar usuarios: ${resource.message}")
+                    binding.swipeRefresh.isRefreshing = false
+                    showError("Error: ${resource.message}")
                 }
                 is Resource.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
@@ -150,47 +205,30 @@ class UsuariosManagementFragment : Fragment() {
             }
         }
 
-        // Observar canchas
         viewModel.canchas.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     allCanchas = resource.data ?: emptyList()
                 }
                 is Resource.Error -> {
-                    showError("Error al cargar canchas: ${resource.message}")
+                    showError("Error canchas: ${resource.message}")
                 }
-                is Resource.Loading -> {
-                    // Loading
-                }
+                is Resource.Loading -> {}
             }
         }
 
-        // Observar resultado de operaciones
         viewModel.updateUserResult.observe(viewLifecycleOwner) { resource ->
             when (resource) {
                 is Resource.Success -> {
                     showSuccess("Operación exitosa")
+                    viewModel.loadAllUsers()
                 }
                 is Resource.Error -> {
                     showError("Error: ${resource.message}")
                 }
-                is Resource.Loading -> {
-                    // Loading
-                }
+                is Resource.Loading -> {}
             }
         }
-    }
-
-    private fun updateStats() {
-        val total = allUsers.size
-        val usuarios = allUsers.count { it.rol == UserRole.USUARIO }
-        val admins = allUsers.count { it.rol == UserRole.ADMIN }
-        val superadmins = allUsers.count { it.rol == UserRole.SUPERADMIN }
-
-        binding.chipTodos.text = "Todos ($total)"
-        binding.chipUsuarios.text = "Usuarios ($usuarios)"
-        binding.chipAdmins.text = "Admins ($admins)"
-        binding.chipSuperadmins.text = "SuperAdmins ($superadmins)"
     }
 
     private fun showEditUserDialog(user: User) {
@@ -201,7 +239,6 @@ class UsuariosManagementFragment : Fragment() {
         val radioAdmin = dialogView.findViewById<RadioButton>(R.id.radioAdmin)
         val radioSuperadmin = dialogView.findViewById<RadioButton>(R.id.radioSuperadmin)
 
-        // Marcar rol actual
         when (user.rol) {
             UserRole.USUARIO -> radioUsuario.isChecked = true
             UserRole.ADMIN -> radioAdmin.isChecked = true
@@ -209,7 +246,7 @@ class UsuariosManagementFragment : Fragment() {
         }
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Editar Usuario: ${user.nombre}")
+            .setTitle("Editar: ${user.nombre}")
             .setView(dialogView)
             .setPositiveButton("Guardar") { _, _ ->
                 val newRole = when {
@@ -232,8 +269,8 @@ class UsuariosManagementFragment : Fragment() {
         val message = if (newStatus) "activar" else "desactivar"
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Confirmar acción")
-            .setMessage("¿Estás seguro de $message a ${user.nombre}?")
+            .setTitle("Confirmar")
+            .setMessage("¿$message a ${user.nombre}?")
             .setPositiveButton("Sí") { _, _ ->
                 viewModel.toggleUserStatus(user.uid, newStatus)
             }
@@ -241,20 +278,9 @@ class UsuariosManagementFragment : Fragment() {
             .show()
     }
 
-    private fun confirmDeleteUser(user: User) {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Eliminar Usuario")
-            .setMessage("¿Estás seguro de eliminar a ${user.nombre}? Esta acción no se puede deshacer.")
-            .setPositiveButton("Eliminar") { _, _ ->
-                showError("Función de eliminar no implementada en el Repository original")
-            }
-            .setNegativeButton("Cancelar", null)
-            .show()
-    }
-
     private fun showAssignCanchaDialog(user: User) {
         if (allCanchas.isEmpty()) {
-            showError("No hay canchas disponibles para asignar")
+            showError("No hay canchas disponibles")
             return
         }
 
@@ -263,13 +289,12 @@ class UsuariosManagementFragment : Fragment() {
 
         val spinner = dialogView.findViewById<Spinner>(R.id.spinnerCanchas)
 
-        // Filtrar canchas sin admin o del mismo admin
         val canchasDisponibles = allCanchas.filter {
             it.adminId == null || it.adminId == user.uid
         }
 
         if (canchasDisponibles.isEmpty()) {
-            showError("No hay canchas disponibles para asignar")
+            showError("No hay canchas disponibles")
             return
         }
 
@@ -279,11 +304,10 @@ class UsuariosManagementFragment : Fragment() {
         spinner.adapter = spinnerAdapter
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Asignar Cancha a ${user.nombre}")
+            .setTitle("Asignar Cancha: ${user.nombre}")
             .setView(dialogView)
             .setPositiveButton("Asignar") { _, _ ->
-                val selectedPosition = spinner.selectedItemPosition
-                val selectedCancha = canchasDisponibles[selectedPosition]
+                val selectedCancha = canchasDisponibles[spinner.selectedItemPosition]
                 viewModel.assignAdminToCancha(user.uid, selectedCancha.id)
             }
             .setNegativeButton("Cancelar", null)

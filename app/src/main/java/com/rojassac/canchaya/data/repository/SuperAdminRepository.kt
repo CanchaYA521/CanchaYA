@@ -28,8 +28,19 @@ class SuperAdminRepository {
 
             val users = snapshot.documents.mapNotNull { doc ->
                 try {
+                    // 🔧 NUEVA FORMA: Manejar fechaCreacion como Timestamp o Long
+                    val fechaCreacion = try {
+                        when (val fecha = doc.get("fechaCreacion")) {
+                            is com.google.firebase.Timestamp -> fecha.toDate().time
+                            is Long -> fecha
+                            else -> System.currentTimeMillis()
+                        }
+                    } catch (e: Exception) {
+                        System.currentTimeMillis()
+                    }
+
                     User(
-                        uid = doc.getString("uid") ?: "",
+                        uid = doc.id, // ✅ Usar doc.id
                         nombre = doc.getString("nombre") ?: "",
                         celular = doc.getString("celular") ?: "",
                         email = doc.getString("email") ?: "",
@@ -43,16 +54,19 @@ class SuperAdminRepository {
                         canchasAsignadas = (doc.get("canchasAsignadas") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         sedeId = doc.getString("sedeId"),
                         tipoAdministracion = doc.getString("tipoAdministracion"),
-                        fechaCreacion = doc.getLong("fechaCreacion") ?: System.currentTimeMillis(),
+                        fechaCreacion = fechaCreacion, // ✅ Usar la fecha parseada correctamente
                         stability = (doc.getLong("stability") ?: 0).toInt()
                     )
                 } catch (e: Exception) {
+                    Log.e("SuperAdminRepo", "Error parseando usuario ${doc.id}: ${e.message}")
                     null
                 }
             }
 
+            Log.d("SuperAdminRepo", "✅ Usuarios cargados: ${users.size}")
             Result.success(users)
         } catch (e: Exception) {
+            Log.e("SuperAdminRepo", "❌ Error al cargar usuarios: ${e.message}")
             Result.failure(e)
         }
     }
