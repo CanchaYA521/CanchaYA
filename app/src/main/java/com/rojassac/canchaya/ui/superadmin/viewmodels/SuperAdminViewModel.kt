@@ -54,6 +54,7 @@ class SuperAdminViewModel : ViewModel() {
     init {
         loadAllUsers()
         loadAllCanchas()
+        cargarSedes() // ✅ AGREGADO (23 Oct 2025)
     }
 
     // ========== FUNCIONES - USUARIOS (CÓDIGO EXISTENTE - NO MODIFICADO) ==========

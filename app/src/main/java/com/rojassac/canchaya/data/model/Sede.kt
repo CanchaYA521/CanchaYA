@@ -4,12 +4,14 @@ import android.os.Parcelable
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
+import com.google.firebase.firestore.PropertyName
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
 /**
  * ✅ CÓDIGO EXISTENTE MANTENIDO
  * ✨ ACTUALIZADO: Agregados campos de amenidades (22 Oct 2025)
+ * ✨ ACTUALIZADO: Agregados campos para Firebase (23 Oct 2025)
  */
 @Parcelize
 data class Sede(
@@ -36,6 +38,7 @@ data class Sede(
     val activa: Boolean = true,
 
     // ✅ CÓDIGO EXISTENTE: Lista de IDs de canchas que pertenecen a esta sede
+    @PropertyName("canchasIds") // ✅ Firebase lo guarda como "canchasIds" con "s"
     val canchaIds: @RawValue List<String>? = null,
 
     // ✅ CÓDIGO EXISTENTE: Administrador asignado
@@ -44,10 +47,18 @@ data class Sede(
     // ✅ CÓDIGO EXISTENTE: Código de invitación
     val codigoInvitacion: String = "",
     val codigoActivo: Boolean = true,
+    val codigoExpiracion: Long = 0L, // ✨ AGREGADO (23 Oct 2025) - Firebase lo busca
+    val codigoUsado: Boolean = false, // ✨ AGREGADO (23 Oct 2025) - Firebase lo busca
+
+    // ✅ CÓDIGO EXISTENTE: ID del creador
+    val creadoPor: String? = null, // ✨ AGREGADO (23 Oct 2025) - Firebase lo busca
 
     // ✅ CÓDIGO EXISTENTE: Fechas
     val fechaCreacion: Timestamp? = null,
     val fechaModificacion: Timestamp? = null,
+
+    @PropertyName("fechaActualizacion")
+    val fechaActualizacion: @RawValue Any? = null, // ✨ AGREGADO (23 Oct 2025) - Firebase lo busca
 
     // ✨ NUEVO: Amenidades de la sede (22 Oct 2025)
     val tieneDucha: Boolean = false,
@@ -72,6 +83,10 @@ data class Sede(
     fun tieneAdminAsignado(): Boolean {
         return !adminId.isNullOrEmpty()
     }
+
+    // ✨ AGREGADO: Función para obtener total de canchas (23 Oct 2025)
+    @Exclude
+    fun getTotalCanchas(): Int = canchaIds?.size ?: 0
 
     // ✨ NUEVO: Función para obtener lista de amenidades activas
     @Exclude

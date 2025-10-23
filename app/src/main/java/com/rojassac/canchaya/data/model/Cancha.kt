@@ -8,6 +8,14 @@ import com.google.firebase.firestore.PropertyName
 import kotlinx.parcelize.Parcelize
 import kotlinx.parcelize.RawValue
 
+// ✨ NUEVO: Data class para franjas horarias (23 Oct 2025)
+@Parcelize
+data class FranjaHoraria(
+    val horaInicio: String = "",
+    val horaFin: String = "",
+    val precio: Double = 0.0
+) : Parcelable
+
 @Parcelize
 data class Cancha(
     @DocumentId
@@ -22,6 +30,9 @@ data class Cancha(
     val latitud: Double = 0.0,
     val longitud: Double = 0.0,
     val precioHora: Double = 0.0,
+
+    // ✨ NUEVO: Precios por franjas horarias (23 Oct 2025)
+    val preciosPorFranja: @RawValue List<FranjaHoraria> = emptyList(),
 
     // ✅ IMÁGENES (soporte para ambos formatos)
     val imagenUrl: String = "", // Imagen principal (compatibilidad con código viejo)
@@ -48,12 +59,16 @@ data class Cancha(
     // Estado
     val activo: Boolean = true,
     val activa: Boolean = true, // ✅ Para compatibilidad
+    val aprobado: Boolean = false,
 
     // ✅ FECHAS: Usar @RawValue para que Parcelize lo acepte
     @PropertyName("fechaCreacion")
     val fechaCreacion: @RawValue Any? = null, // ✅ Puede ser Long o Timestamp
 
-    // 🆕 NUEVO CAMPO: Fecha de asignación (22 Oct 2025)
+    @PropertyName("fechaActualizacion")
+    val fechaActualizacion: @RawValue Any? = null, // ✨ AGREGADO: Fecha actualización (23 Oct 2025)
+
+// 🆕 NUEVO CAMPO: Fecha de asignación (22 Oct 2025)
     @PropertyName("fechaAsignacion")
     val fechaAsignacion: @RawValue Any? = null, // ✅ Timestamp de Firebase
 
@@ -110,4 +125,35 @@ data class Cancha(
     @get:Exclude
     val tieneAdminAsignado: Boolean
         get() = !adminId.isNullOrEmpty() || !adminAsignado.isNullOrEmpty()
+
+    // ✨ NUEVO: Función para obtener precio según hora (23 Oct 2025)
+    @Exclude
+    fun getPrecioPorHora(hora: String): Double {
+        // Si tiene franjas configuradas, buscar en las franjas
+        if (preciosPorFranja.isNotEmpty()) {
+            val horaInt = hora.replace(":", "").toIntOrNull() ?: return precioHora
+
+            for (franja in preciosPorFranja) {
+                val inicioInt = franja.horaInicio.replace(":", "").toIntOrNull() ?: continue
+                val finInt = franja.horaFin.replace(":", "").toIntOrNull() ?: continue
+
+                if (horaInt in inicioInt until finInt) {
+                    return franja.precio
+                }
+            }
+        }
+
+        // Si no tiene franjas o no encontró coincidencia, usar precio por hora
+        return precioHora
+    }
+
+    // ✨ NUEVO: Función para mostrar resumen de precios (23 Oct 2025)
+    @Exclude
+    fun getResumenPrecios(): String {
+        return if (preciosPorFranja.isNotEmpty()) {
+            "Desde S/ ${preciosPorFranja.minOfOrNull { it.precio } ?: precioHora}"
+        } else {
+            "S/ $precioHora/hora"
+        }
+    }
 }
