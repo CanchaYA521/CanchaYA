@@ -1,10 +1,12 @@
 package com.rojassac.canchaya.ui.superadmin
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rojassac.canchaya.data.model.Cancha
+import com.rojassac.canchaya.data.model.Plan
 import com.rojassac.canchaya.data.model.Sede
 import com.rojassac.canchaya.data.model.User
 import com.rojassac.canchaya.data.model.UserRole
@@ -16,7 +18,7 @@ class SuperAdminViewModel : ViewModel() {
 
     private val repository = SuperAdminRepository()
 
-    // ========== USUARIOS (CÓDIGO EXISTENTE - NO MODIFICADO) ==========
+    // ========== USUARIOS ==========
 
     private val _usuarios = MutableLiveData<Resource<List<User>>>()
     val usuarios: LiveData<Resource<List<User>>> = _usuarios
@@ -24,64 +26,75 @@ class SuperAdminViewModel : ViewModel() {
     private val _updateUserResult = MutableLiveData<Resource<Unit>>()
     val updateUserResult: LiveData<Resource<Unit>> = _updateUserResult
 
-    // ========== CANCHAS (CÓDIGO EXISTENTE - NO MODIFICADO) ==========
+    // ========== CANCHAS ==========
 
     private val _canchasGlobales = MutableLiveData<Resource<List<Cancha>>>()
     val canchasGlobales: LiveData<Resource<List<Cancha>>> = _canchasGlobales
 
-    private val _canchas = MutableLiveData<Resource<List<Cancha>>>()
-    val canchas: LiveData<Resource<List<Cancha>>> = _canchas
+    // ✅ ALIAS para compatibilidad con código viejo
+    val canchas: LiveData<Resource<List<Cancha>>> = _canchasGlobales
 
-    private val _updateCanchaResult = MutableLiveData<Resource<Unit>>()
-    val updateCanchaResult: LiveData<Resource<Unit>> = _updateCanchaResult
+    private val _deleteCanchaResult = MutableLiveData<Resource<Unit>>()
+    val deleteCanchaResult: LiveData<Resource<Unit>> = _deleteCanchaResult
 
-    // ========== ESTADÍSTICAS (CÓDIGO EXISTENTE - NO MODIFICADO) ==========
-
-    private val _userStats = MutableLiveData<Resource<Map<String, Int>>>()
-    val userStats: LiveData<Resource<Map<String, Int>>> = _userStats
-
-    private val _canchaStats = MutableLiveData<Resource<Map<String, Int>>>()
-    val canchaStats: LiveData<Resource<Map<String, Int>>> = _canchaStats
-
-    // 🆕 ========== SEDES (NUEVO - 22 Oct 2025) ==========
+    // ========== SEDES ==========
 
     private val _sedes = MutableLiveData<Resource<List<Sede>>>()
     val sedes: LiveData<Resource<List<Sede>>> = _sedes
 
+    private val _createSedeResult = MutableLiveData<Resource<String>>()
+    val createSedeResult: LiveData<Resource<String>> = _createSedeResult
+
     private val _updateSedeResult = MutableLiveData<Resource<Unit>>()
     val updateSedeResult: LiveData<Resource<Unit>> = _updateSedeResult
 
-    init {
-        loadAllUsers()
-        loadAllCanchas()
-        cargarSedes() // ✅ AGREGADO (23 Oct 2025)
-    }
+    private val _deleteSedeResult = MutableLiveData<Resource<Unit>>()
+    val deleteSedeResult: LiveData<Resource<Unit>> = _deleteSedeResult
 
-    // ========== FUNCIONES - USUARIOS (CÓDIGO EXISTENTE - NO MODIFICADO) ==========
+    private val _estadisticasUsuarios = MutableLiveData<Resource<Map<String, Int>>>()
+    val estadisticasUsuarios: LiveData<Resource<Map<String, Int>>> = _estadisticasUsuarios
 
-    fun loadAllUsers() {
+    private val _estadisticasCanchas = MutableLiveData<Resource<Map<String, Int>>>()
+    val estadisticasCanchas: LiveData<Resource<Map<String, Int>>> = _estadisticasCanchas
+
+    private val _estadisticasSedes = MutableLiveData<Resource<Map<String, Int>>>()
+    val estadisticasSedes: LiveData<Resource<Map<String, Int>>> = _estadisticasSedes
+
+    // ✅ NUEVO: PLANES
+    private val _planes = MutableLiveData<Resource<List<Plan>>>()
+    val planes: LiveData<Resource<List<Plan>>> = _planes
+
+    private val _updatePlanResult = MutableLiveData<Resource<Unit>>()
+    val updatePlanResult: LiveData<Resource<Unit>> = _updatePlanResult
+
+    private val _suscriptoresPorPlan = MutableLiveData<Map<String, Int>>()
+    val suscriptoresPorPlan: LiveData<Map<String, Int>> = _suscriptoresPorPlan
+
+    // ========== FUNCIONES DE USUARIOS ==========
+
+    fun loadUsuarios() {
         viewModelScope.launch {
             _usuarios.value = Resource.Loading()
             val result = repository.getAllUsers()
-            if (result.isSuccess) {
-                _usuarios.value = Resource.Success(result.getOrNull()!!)
+            _usuarios.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyList())
             } else {
-                _usuarios.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar usuarios")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error desconocido")
             }
         }
     }
 
-    fun loadUsuarios() = loadAllUsers()
+    // ✅ ALIAS para compatibilidad
+    fun loadAllUsers() = loadUsuarios()
 
     fun updateUserRole(userId: String, newRole: UserRole) {
         viewModelScope.launch {
             _updateUserResult.value = Resource.Loading()
             val result = repository.updateUserRole(userId, newRole)
-            if (result.isSuccess) {
-                _updateUserResult.value = Resource.Success(Unit)
-                loadAllUsers()
+            _updateUserResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _updateUserResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al actualizar rol")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al actualizar")
             }
         }
     }
@@ -90,11 +103,10 @@ class SuperAdminViewModel : ViewModel() {
         viewModelScope.launch {
             _updateUserResult.value = Resource.Loading()
             val result = repository.toggleUserStatus(userId, isActive)
-            if (result.isSuccess) {
-                _updateUserResult.value = Resource.Success(Unit)
-                loadAllUsers()
+            _updateUserResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _updateUserResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
             }
         }
     }
@@ -103,167 +115,226 @@ class SuperAdminViewModel : ViewModel() {
         viewModelScope.launch {
             _updateUserResult.value = Resource.Loading()
             val result = repository.assignAdminToCancha(adminId, canchaId)
-            if (result.isSuccess) {
-                _updateUserResult.value = Resource.Success(Unit)
-                loadAllUsers()
-                cargarCanchasGlobales()
+            _updateUserResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _updateUserResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al asignar admin")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al asignar admin")
             }
         }
     }
 
-    // ========== FUNCIONES - CANCHAS GLOBALES (CÓDIGO EXISTENTE - NO MODIFICADO) ==========
+    // ========== FUNCIONES DE CANCHAS ==========
 
-    fun cargarCanchasGlobales() {
+    fun loadCanchasGlobales() {
         viewModelScope.launch {
             _canchasGlobales.value = Resource.Loading()
             val result = repository.getAllCanchas()
-            if (result.isSuccess) {
-                _canchasGlobales.value = Resource.Success(result.getOrNull()!!)
+            _canchasGlobales.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyList())
             } else {
-                _canchasGlobales.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar canchas")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error desconocido")
             }
         }
     }
 
-    fun loadAllCanchas() {
+    // ✅ ALIAS para compatibilidad
+    fun loadCanchas() = loadCanchasGlobales()
+    fun loadAllCanchas() = loadCanchasGlobales()
+
+    fun toggleCanchaApproval(canchaId: String, isActive: Boolean) {
         viewModelScope.launch {
-            _canchas.value = Resource.Loading()
-            val result = repository.getAllCanchas()
-            if (result.isSuccess) {
-                _canchas.value = Resource.Success(result.getOrNull()!!)
+            _deleteCanchaResult.value = Resource.Loading()
+            val result = repository.toggleCanchaApproval(canchaId, isActive)
+            _deleteCanchaResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _canchas.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar canchas")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
             }
         }
     }
 
-    fun loadCanchas() = loadAllCanchas()
-
-    fun toggleCanchaStatus(cancha: Cancha) {
+    fun deleteCancha(canchaId: String) {
         viewModelScope.launch {
-            _updateCanchaResult.value = Resource.Loading()
-            val result = repository.toggleCanchaApproval(cancha.id, !cancha.activo)
-            if (result.isSuccess) {
-                _updateCanchaResult.value = Resource.Success(Unit)
-                cargarCanchasGlobales()
-            } else {
-                _updateCanchaResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
-            }
-        }
-    }
-
-    fun eliminarCancha(canchaId: String) {
-        viewModelScope.launch {
-            _updateCanchaResult.value = Resource.Loading()
+            _deleteCanchaResult.value = Resource.Loading()
             val result = repository.deleteCancha(canchaId)
-            if (result.isSuccess) {
-                _updateCanchaResult.value = Resource.Success(Unit)
-                cargarCanchasGlobales()
+            _deleteCanchaResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _updateCanchaResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al eliminar cancha")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al eliminar")
             }
         }
     }
 
-    // ========== FUNCIONES - ESTADÍSTICAS (CÓDIGO EXISTENTE - NO MODIFICADO) ==========
+    // ========== FUNCIONES DE SEDES ==========
 
-    fun loadUserStats() {
-        viewModelScope.launch {
-            _userStats.value = Resource.Loading()
-            val result = repository.getUserCountByRole()
-            if (result.isSuccess) {
-                _userStats.value = Resource.Success(result.getOrNull()!!)
-            } else {
-                _userStats.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar estadísticas")
-            }
-        }
-    }
-
-    fun loadCanchaStats() {
-        viewModelScope.launch {
-            _canchaStats.value = Resource.Loading()
-            val result = repository.getCanchasStats()
-            if (result.isSuccess) {
-                _canchaStats.value = Resource.Success(result.getOrNull()!!)
-            } else {
-                _canchaStats.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar estadísticas")
-            }
-        }
-    }
-
-    // 🆕 ========== FUNCIONES - SEDES (NUEVO - 22 Oct 2025) ==========
-
-    /**
-     * 🆕 NUEVA FUNCIÓN: Cargar todas las sedes
-     */
-    fun cargarSedes() {
+    fun loadSedes() {
         viewModelScope.launch {
             _sedes.value = Resource.Loading()
             val result = repository.getAllSedes()
-            if (result.isSuccess) {
-                _sedes.value = Resource.Success(result.getOrNull()!!)
+            _sedes.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyList())
             } else {
-                _sedes.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar sedes")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error desconocido")
             }
         }
     }
 
-    /**
-     * 🆕 NUEVA FUNCIÓN: Guardar una sede (crear o actualizar)
-     */
-    fun guardarSede(sede: Sede) {
+    // ✅ ALIAS para compatibilidad
+    fun cargarSedes() = loadSedes()
+
+    fun crearSede(sede: Sede) {
         viewModelScope.launch {
-            _updateSedeResult.value = Resource.Loading()
-
-            val result = if (sede.id.isEmpty()) {
-                // Crear nueva sede
-                repository.crearSede(sede)
+            _createSedeResult.value = Resource.Loading()
+            val result = repository.crearSede(sede)
+            _createSedeResult.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: "")
             } else {
-                // Actualizar sede existente
-                repository.actualizarSede(sede)
-            }
-
-            if (result.isSuccess) {
-                _updateSedeResult.value = Resource.Success(Unit)
-                cargarSedes() // Recargar lista de sedes
-            } else {
-                _updateSedeResult.value = Resource.Error(
-                    result.exceptionOrNull()?.message ?: "Error al guardar sede"
-                )
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al crear sede")
             }
         }
     }
 
-    /**
-     * 🆕 NUEVA FUNCIÓN: Eliminar una sede
-     */
-    fun eliminarSede(sedeId: String) {
+    // ✅ ALIAS para compatibilidad
+    fun guardarSede(sede: Sede) = crearSede(sede)
+
+    fun actualizarSede(sede: Sede) {
         viewModelScope.launch {
             _updateSedeResult.value = Resource.Loading()
+            val result = repository.actualizarSede(sede)
+            _updateSedeResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al actualizar sede")
+            }
+        }
+    }
+
+    fun deleteSede(sedeId: String) {
+        viewModelScope.launch {
+            _deleteSedeResult.value = Resource.Loading()
             val result = repository.deleteSede(sedeId)
-            if (result.isSuccess) {
-                _updateSedeResult.value = Resource.Success(Unit)
-                cargarSedes()
+            _deleteSedeResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _updateSedeResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al eliminar sede")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al eliminar sede")
             }
         }
     }
 
-    /**
-     * 🆕 NUEVA FUNCIÓN: Cambiar estado de una sede (activa/inactiva)
-     */
+    // ✅ ALIAS para compatibilidad
+    fun eliminarSede(sedeId: String) = deleteSede(sedeId)
+
     fun toggleSedeStatus(sedeId: String, isActive: Boolean) {
         viewModelScope.launch {
             _updateSedeResult.value = Resource.Loading()
             val result = repository.toggleSedeStatus(sedeId, isActive)
-            if (result.isSuccess) {
-                _updateSedeResult.value = Resource.Success(Unit)
-                cargarSedes()
+            _updateSedeResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
             } else {
-                _updateSedeResult.value = Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado de sede")
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
+            }
+        }
+    }
+
+    fun reactivarCodigoSede(sedeId: String) {
+        viewModelScope.launch {
+            _updateSedeResult.value = Resource.Loading()
+            val result = repository.reactivarCodigoSede(sedeId)
+            _updateSedeResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al reactivar código")
+            }
+        }
+    }
+
+    // ========== ESTADÍSTICAS ==========
+
+    fun loadEstadisticasUsuarios() {
+        viewModelScope.launch {
+            _estadisticasUsuarios.value = Resource.Loading()
+            val result = repository.getUserCountByRole()
+            _estadisticasUsuarios.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyMap())
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error")
+            }
+        }
+    }
+
+    fun loadEstadisticasCanchas() {
+        viewModelScope.launch {
+            _estadisticasCanchas.value = Resource.Loading()
+            val result = repository.getCanchasStats()
+            _estadisticasCanchas.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyMap())
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error")
+            }
+        }
+    }
+
+    fun loadEstadisticasSedes() {
+        viewModelScope.launch {
+            _estadisticasSedes.value = Resource.Loading()
+            val result = repository.getSedesStats()
+            _estadisticasSedes.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyMap())
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error")
+            }
+        }
+    }
+
+    // ========== FUNCIONES DE PLANES (✅ NUEVO - 23 Oct 2025) ==========
+
+    fun loadPlanes() {
+        viewModelScope.launch {
+            _planes.value = Resource.Loading()
+            val result = repository.getAllPlanes()
+            _planes.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyList())
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar planes")
+            }
+        }
+    }
+
+    fun updatePlan(plan: Plan) {
+        viewModelScope.launch {
+            _updatePlanResult.value = Resource.Loading()
+            val result = repository.updatePlan(plan)
+            _updatePlanResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al actualizar plan")
+            }
+        }
+    }
+
+    fun loadSuscriptoresPorPlan(planIds: List<String>) {
+        viewModelScope.launch {
+            val suscriptoresMap = mutableMapOf<String, Int>()
+
+            planIds.forEach { planId ->
+                val result = repository.getSuscriptoresPorPlan(planId)
+                if (result.isSuccess) {
+                    suscriptoresMap[planId] = result.getOrNull() ?: 0
+                }
+            }
+
+            _suscriptoresPorPlan.value = suscriptoresMap
+        }
+    }
+
+    fun togglePlanStatus(planId: String, activo: Boolean) {
+        viewModelScope.launch {
+            _updatePlanResult.value = Resource.Loading()
+            val result = repository.togglePlanStatus(planId, activo)
+            _updatePlanResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
             }
         }
     }

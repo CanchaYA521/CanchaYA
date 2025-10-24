@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.rojassac.canchaya.data.model.Cancha
+import com.rojassac.canchaya.data.model.Plan // ✅ AGREGADO IMPORT (23 Oct 2025)
 import com.rojassac.canchaya.data.model.Sede
 import com.rojassac.canchaya.data.model.User
 import com.rojassac.canchaya.data.model.UserRole
@@ -208,43 +209,30 @@ class SuperAdminRepository {
         }
     }
 
-    // ========== GESTIÓN DE SEDES (🔵 MODIFICADO - 22 Oct 2025) ==========
+    // ========== GESTIÓN DE SEDES (✅ CÓDIGO EXISTENTE - NO MODIFICADO) ==========
 
-    /**
-     * 🔵 MODIFICADO: Generar código secuencial único (22 Oct 2025)
-     * Formato: SE00000001, SE00000002, etc.
-     */
     private suspend fun generarCodigoInvitacion(tipo: String): String {
         return try {
-            // Obtener contador actual de Firebase
             val contadorRef = firestore.collection("configuracion")
                 .document("contadores")
-
             val contadorDoc = contadorRef.get().await()
             val contadorActual = contadorDoc.getLong("ultimaSedeId") ?: 0L
             val nuevoContador = contadorActual + 1
 
-            // Actualizar contador en transacción para evitar duplicados
             firestore.runTransaction { transaction ->
                 transaction.update(contadorRef, "ultimaSedeId", nuevoContador)
             }.await()
 
-            // Generar código: SE00000001
             val codigo = String.format("SE%08d", nuevoContador)
             Log.d("SuperAdminRepo", "✅ Código generado: $codigo")
             codigo
-
         } catch (e: Exception) {
             Log.e("SuperAdminRepo", "❌ Error al generar código: ${e.message}", e)
-            // Fallback: generar con timestamp
             val timestamp = System.currentTimeMillis() % 100000000
             String.format("SE%08d", timestamp)
         }
     }
 
-    /**
-     * ✅ CÓDIGO EXISTENTE - NO MODIFICADO
-     */
     suspend fun getAllSedes(): Result<List<Sede>> {
         return try {
             val snapshot = firestore.collection(Constants.SEDES_COLLECTION)
@@ -265,16 +253,10 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * 🔵 MODIFICADO: Crear sede con código secuencial (22 Oct 2025)
-     * 🔧 CORREGIDO: canchasIds -> canchaIds (22 Oct 2025)
-     */
     suspend fun crearSede(sede: Sede): Result<String> {
         return try {
-            // 1. 🔵 MODIFICADO: Generar código único secuencial
             val codigoInvitacion = generarCodigoInvitacion("sede")
 
-            // 2. Crear datos de la sede (🔧 CORREGIDO: canchasIds -> canchaIds)
             val sedeData = hashMapOf(
                 "nombre" to sede.nombre,
                 "direccion" to sede.direccion,
@@ -287,13 +269,12 @@ class SuperAdminRepository {
                 "horaCierre" to sede.horaCierre,
                 "imageUrl" to sede.imageUrl,
                 "activa" to sede.activa,
-                "canchaIds" to sede.canchaIds,  // 🔧 CORREGIDO: era "canchasIds"
-                "adminId" to "", // Sin admin asignado
-                "codigoInvitacion" to codigoInvitacion, // Código único
-                "codigoActivo" to true, // Código activo
+                "canchaIds" to sede.canchaIds,
+                "adminId" to "",
+                "codigoInvitacion" to codigoInvitacion,
+                "codigoActivo" to true,
                 "fechaCreacion" to com.google.firebase.Timestamp.now(),
                 "fechaModificacion" to com.google.firebase.Timestamp.now(),
-                // ✨ NUEVO: Agregar amenidades (22 Oct 2025)
                 "tieneDucha" to sede.tieneDucha,
                 "tieneGaraje" to sede.tieneGaraje,
                 "tieneLuzNocturna" to sede.tieneLuzNocturna,
@@ -304,26 +285,18 @@ class SuperAdminRepository {
                 "tieneVestidores" to sede.tieneVestidores
             )
 
-            // 3. Guardar sede en Firestore
             val docRef = firestore.collection(Constants.SEDES_COLLECTION)
                 .add(sedeData)
                 .await()
-
             val sedeId = docRef.id
-
             Log.d("SuperAdminRepo", "✅ Sede creada: $sedeId con código: $codigoInvitacion")
             Result.success(sedeId)
-
         } catch (e: Exception) {
             Log.e("SuperAdminRepo", "❌ Error al crear sede: ${e.message}", e)
             Result.failure(e)
         }
     }
 
-    /**
-     * ✅ CÓDIGO EXISTENTE - NO MODIFICADO
-     * 🔧 CORREGIDO: canchasIds -> canchaIds (22 Oct 2025)
-     */
     suspend fun actualizarSede(sede: Sede): Result<Unit> {
         return try {
             val sedeData = hashMapOf(
@@ -338,10 +311,9 @@ class SuperAdminRepository {
                 "horaCierre" to sede.horaCierre,
                 "imageUrl" to sede.imageUrl,
                 "activa" to sede.activa,
-                "canchaIds" to sede.canchaIds,  // 🔧 CORREGIDO: era "canchasIds"
+                "canchaIds" to sede.canchaIds,
                 "adminId" to sede.adminId,
                 "fechaModificacion" to com.google.firebase.Timestamp.now(),
-                // ✨ NUEVO: Agregar amenidades (22 Oct 2025)
                 "tieneDucha" to sede.tieneDucha,
                 "tieneGaraje" to sede.tieneGaraje,
                 "tieneLuzNocturna" to sede.tieneLuzNocturna,
@@ -356,16 +328,12 @@ class SuperAdminRepository {
                 .document(sede.id)
                 .update(sedeData as Map<String, Any>)
                 .await()
-
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    /**
-     * ✅ CÓDIGO EXISTENTE - NO MODIFICADO
-     */
     suspend fun deleteSede(sedeId: String): Result<Unit> {
         return try {
             firestore.collection(Constants.SEDES_COLLECTION)
@@ -378,9 +346,6 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * ✅ CÓDIGO EXISTENTE - NO MODIFICADO
-     */
     suspend fun toggleSedeStatus(sedeId: String, isActive: Boolean): Result<Unit> {
         return try {
             firestore.collection(Constants.SEDES_COLLECTION)
@@ -393,9 +358,6 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * ✅ CÓDIGO EXISTENTE - NO MODIFICADO
-     */
     suspend fun getSedesStats(): Result<Map<String, Int>> {
         return try {
             val snapshot = firestore.collection(Constants.SEDES_COLLECTION)
@@ -419,9 +381,6 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * 🆕 NUEVA FUNCIÓN: Reactivar código de sede (SuperAdmin) (22 Oct 2025)
-     */
     suspend fun reactivarCodigoSede(sedeId: String): Result<Unit> {
         return try {
             firestore.collection(Constants.SEDES_COLLECTION)
@@ -431,16 +390,122 @@ class SuperAdminRepository {
                         "codigoActivo" to true,
                         "adminId" to "",
                         "fechaModificacion" to com.google.firebase.Timestamp.now()
-                       )
+                    )
                 )
                 .await()
-
             Log.d("SuperAdminRepo", "✅ Código reactivado para sede: $sedeId")
             Result.success(Unit)
-
         } catch (e: Exception) {
             Log.e("SuperAdminRepo", "❌ Error al reactivar código: ${e.message}", e)
             Result.failure(e)
         }
+    }
+
+    // ✅ ========== GESTIÓN DE PLANES (NUEVO - 23 Oct 2025) ==========
+
+    /**
+     * ✅ NUEVA FUNCIÓN: Obtener todos los planes
+     */
+    suspend fun getAllPlanes(): Result<List<Plan>> {
+        return try {
+            Log.d(TAG, "Obteniendo todos los planes...")
+
+            val snapshot = firestore.collection(Constants.PLANS_COLLECTION)
+                .get()
+                .await()
+
+            val planes = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(Plan::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error al convertir plan: ${e.message}")
+                    null
+                }
+            }
+
+            Log.d(TAG, "Planes obtenidos: ${planes.size}")
+            Result.success(planes)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al obtener planes", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * ✅ NUEVA FUNCIÓN: Actualizar un plan
+     */
+    suspend fun updatePlan(plan: Plan): Result<Unit> {
+        return try {
+            Log.d(TAG, "Actualizando plan: ${plan.id}")
+
+            val planData = hashMapOf<String, Any>(
+                "nombre" to plan.nombre,
+                "precio" to plan.precio,
+                "comision" to plan.comision,
+                "maxCanchas" to plan.maxCanchas,
+                "descripcion" to plan.descripcion,
+                "activo" to plan.activo,
+                "destacado" to plan.destacado,
+                "caracteristicas" to plan.caracteristicas,
+                "color" to plan.color,
+                "plazoRetiro" to plan.plazoRetiro,
+                "posicionPrioritaria" to plan.posicionPrioritaria,
+                "marketingIncluido" to plan.marketingIncluido,
+                "whiteLabel" to plan.whiteLabel,
+                "soporte" to plan.soporte
+            )
+
+            firestore.collection(Constants.PLANS_COLLECTION)
+                .document(plan.id)
+                .update(planData)
+                .await()
+
+            Log.d(TAG, "Plan actualizado exitosamente")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al actualizar plan", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * ✅ NUEVA FUNCIÓN: Obtener cantidad de suscriptores por plan
+     */
+    suspend fun getSuscriptoresPorPlan(planId: String): Result<Int> {
+        return try {
+            val snapshot = firestore.collection(Constants.SUBSCRIPTIONS_COLLECTION)
+                .whereEqualTo("planId", planId)
+                .whereEqualTo("estado", "ACTIVA")
+                .get()
+                .await()
+
+            Result.success(snapshot.size())
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al contar suscriptores", e)
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * ✅ NUEVA FUNCIÓN: Toggle estado de un plan
+     */
+    suspend fun togglePlanStatus(planId: String, activo: Boolean): Result<Unit> {
+        return try {
+            Log.d(TAG, "Cambiando estado del plan $planId a $activo")
+
+            firestore.collection(Constants.PLANS_COLLECTION)
+                .document(planId)
+                .update("activo", activo)
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al cambiar estado del plan", e)
+            Result.failure(e)
+        }
+    }
+
+    companion object {
+        private const val TAG = "SuperAdminRepository"
     }
 }

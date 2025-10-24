@@ -11,12 +11,17 @@ object Constants {
     const val HORARIOS_COLLECTION = "horarios"
     const val RESENAS_COLLECTION = "resenas"
     const val CODIGO_LOGS_COLLECTION = "codigo_logs"
-    const val SEDES_COLLECTION = "sedes"  // 🆕 AGREGADO (22 Oct 2025)
+    const val SEDES_COLLECTION = "sedes"
 
-    // 🆕 NUEVAS COLECCIONES - Sistema de Pagos y Suscripciones
+    // Colecciones - Sistema de Pagos y Suscripciones
     const val SUBSCRIPTIONS_COLLECTION = "subscriptions"
     const val PLANS_COLLECTION = "plans"
     const val CARGOS_COLLECTION = "cargos"
+
+    // ✅ NUEVO: Colecciones - Sistema de Configuración SuperAdmin (23 Oct 2025)
+    const val PROMOCIONES_COLLECTION = "promociones"
+    const val CONFIGURACION_COLLECTION = "configuracion"
+    const val NOTIFICACIONES_COLLECTION = "notificaciones"
 
     // ========================
     // SharedPreferences
@@ -29,47 +34,59 @@ object Constants {
     // Códigos de vinculación
     // ========================
     const val CODIGO_EXPIRACION_DIAS = 7
-    const val CODIGO_LENGTH = 8
-
-    // 🆕 NUEVO: Formato de códigos de sede (22 Oct 2025)
-    const val CODIGO_SEDE_PREFIX = "SE"
-    const val CODIGO_SEDE_LENGTH = 10  // SE00000001 = 10 caracteres
+    const val CODIGO_LENGTH = 10
+    const val CODIGO_PREFIX = "SE"
 
     // ========================
-    // Formato de fechas
+    // Estados de Reserva
     // ========================
-    const val DATE_FORMAT = "yyyy-MM-dd"
-    const val TIME_FORMAT = "HH:mm"
-    const val DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss"
-
-    // 🆕 NUEVAS CONSTANTES - Sistema de Suscripciones
-    // ========================
-    // IDs de Planes (deben coincidir con Firebase)
-    // ========================
-    const val PLAN_BASICO = "BASICO"
-    const val PLAN_PRO = "PRO"
-    const val PLAN_PREMIUM = "PREMIUM"
-    const val PLAN_ENTERPRISE = "ENTERPRISE"
+    const val ESTADO_PENDIENTE = "PENDIENTE"
+    const val ESTADO_CONFIRMADA = "CONFIRMADA"
+    const val ESTADO_COMPLETADA = "COMPLETADA"
+    const val ESTADO_CANCELADA = "CANCELADA"
 
     // ========================
-    // Duración de suscripciones
+    // Roles de Usuario
     // ========================
-    const val DIAS_MES = 30L // Para calcular fechas de vencimiento
-    const val MILISEGUNDOS_DIA = 86400000L // 24 horas en milisegundos
+    const val ROLE_USUARIO = "USUARIO"
+    const val ROLE_ADMIN = "ADMIN"
+    const val ROLE_SUPERADMIN = "SUPERADMIN"
+
+    // ✅ NUEVO - IDs de Planes (23 Oct 2025)
+    const val PLAN_BASICO = "basico"
+    const val PLAN_PRO = "pro"
+    const val PLAN_PREMIUM = "premium"
+    const val PLAN_ENTERPRISE = "enterprise"
 
     // ========================
-    // Comisiones por plan (en porcentaje)
+    // Deportes disponibles
     // ========================
-    const val COMISION_BASICO = 0.40 // 40%
-    const val COMISION_PRO = 0.25 // 25%
-    const val COMISION_PREMIUM = 0.15 // 15%
-    const val COMISION_ENTERPRISE = 0.0 // 0%
+    val DEPORTES_DISPONIBLES = listOf(
+        "Fútbol",
+        "Fútbol 7",
+        "Fútbol 5",
+        "Básquetbol",
+        "Vóley",
+        "Tenis",
+        "Pádel",
+        "Otro"
+    )
 
     // ========================
-    // Plazos de retiro (en días)
+    // Tipos de suelo
     // ========================
-    const val PLAZO_RETIRO_BASICO = 7
-    const val PLAZO_RETIRO_PRO = 1
-    const val PLAZO_RETIRO_PREMIUM = 0 // Mismo día
-    const val PLAZO_RETIRO_ENTERPRISE = 0 // Mismo día
+    val TIPOS_SUELO = listOf(
+        "Grass Natural",
+        "Grass Sintético",
+        "Cemento",
+        "Parquet",
+        "Arcilla",
+        "Otro"
+    )
+
+    // ✅ NUEVO - Formato de fecha (23 Oct 2025)
+    const val DATE_FORMAT = "dd/MM/yyyy"
+
+    // ✅ NUEVO - IDs de Configuración (23 Oct 2025)
+    const val CONFIGURACION_GLOBAL_ID = "global"
 }

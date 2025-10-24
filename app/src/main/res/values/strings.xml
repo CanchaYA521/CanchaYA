@@ -218,5 +218,7 @@
     <string name="error_nombre_vacio">El nombre no puede estar vacío</string>
     <string name="error_celular_vacio">El celular no puede estar vacío</string>
     <string name="error_celular_invalido">El celular debe tener 9 dígitos</string>
-
+    <!-- ✅ NUEVO: Configuración SuperAdmin (23 Oct 2025) -->
+    <string name="icono_opcion">Icono de opción</string>
+    <string name="ir_a_opcion">Ir a opción</string>
 </resources>
