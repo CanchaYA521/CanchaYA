@@ -1,18 +1,23 @@
 package com.rojassac.canchaya.ui.superadmin.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.rojassac.canchaya.R
 import com.rojassac.canchaya.databinding.FragmentConfiguracionBinding
+import com.rojassac.canchaya.ui.auth.LoginActivity
 import com.rojassac.canchaya.ui.superadmin.adapters.ConfigOpcionesAdapter
+import com.rojassac.canchaya.utils.SessionManager
 
 /**
- * ✅ ACTUALIZADO (23 Oct 2025)
- * Fragment de configuración del SuperAdmin con navegación a submódulos
+ * ✅ ACTUALIZADO (24 Oct 2025)
+ * Fragment de configuración del SuperAdmin con navegación a submódulos y cerrar sesión
  */
 class ConfiguracionFragment : Fragment() {
 
@@ -20,6 +25,7 @@ class ConfiguracionFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var adapter: ConfigOpcionesAdapter
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,6 +38,9 @@ class ConfiguracionFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        sessionManager = SessionManager(requireContext())
+
         setupRecyclerView()
         setupOpciones()
     }
@@ -78,6 +87,12 @@ class ConfiguracionFragment : Fragment() {
                 titulo = "Información del Sistema",
                 descripcion = "Versión y estadísticas generales",
                 icono = R.drawable.ic_info
+            ),
+            ConfigOpcion(
+                id = 6,
+                titulo = "Cerrar Sesión",
+                descripcion = "Salir de la aplicación",
+                icono = R.drawable.ic_logout
             )
         )
 
@@ -91,6 +106,7 @@ class ConfiguracionFragment : Fragment() {
             3 -> navegarAParametrosGlobales()
             4 -> navegarANotificaciones()
             5 -> navegarAInfoSistema()
+            6 -> mostrarDialogoCerrarSesion()
         }
     }
 
@@ -103,7 +119,6 @@ class ConfiguracionFragment : Fragment() {
     }
 
     private fun navegarAPromociones() {
-        // ✅ CORREGIDO: Navegar al fragment de promociones
         val fragment = GestionPromocionesFragment()
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
@@ -120,11 +135,45 @@ class ConfiguracionFragment : Fragment() {
     }
 
     private fun navegarANotificaciones() {
-        showToast("Próximamente: Notificaciones Masivas")
+        val fragment = NotificacionesMasivasFragment()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun navegarAInfoSistema() {
-        showToast("Próximamente: Información del Sistema")
+        val fragment = InformacionSistemaFragment()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun mostrarDialogoCerrarSesion() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Cerrar Sesión")
+            .setMessage("¿Estás seguro que deseas cerrar sesión?")
+            .setPositiveButton("Sí") { _, _ ->
+                cerrarSesion()
+            }
+            .setNegativeButton("No", null)
+            .setIcon(R.drawable.ic_logout)
+            .show()
+    }
+
+    private fun cerrarSesion() {
+        // Cerrar sesión en Firebase
+        FirebaseAuth.getInstance().signOut()
+
+        // Limpiar sesión local
+        sessionManager.clearSession()
+
+        // Navegar al Login
+        val intent = Intent(requireContext(), LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     private fun showToast(mensaje: String) {
@@ -135,14 +184,14 @@ class ConfiguracionFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-}
 
-/**
- * ✅ DATA CLASS: Opción de configuración
- */
-data class ConfigOpcion(
-    val id: Int,
-    val titulo: String,
-    val descripcion: String,
-    val icono: Int
-)
+    /**
+     * ✅ DATA CLASS: Opción de configuración
+     */
+    data class ConfigOpcion(
+        val id: Int,
+        val titulo: String,
+        val descripcion: String,
+        val icono: Int
+    )
+}

@@ -5,48 +5,49 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.rojassac.canchaya.databinding.ItemConfigOptionBinding
-import com.rojassac.canchaya.ui.superadmin.fragments.ConfigOpcion
+import com.rojassac.canchaya.databinding.ItemConfigOpcionBinding
+import com.rojassac.canchaya.ui.superadmin.fragments.ConfiguracionFragment.ConfigOpcion
 
 /**
- * ✅ NUEVO ARCHIVO (23 Oct 2025)
- * Adapter para las opciones del menú de configuración del SuperAdmin
+ * ✅ ACTUALIZADO (24 Oct 2025)
+ * Adapter para mostrar las opciones de configuración del SuperAdmin
  */
 class ConfigOpcionesAdapter(
     private val onOpcionClick: (ConfigOpcion) -> Unit
-) : ListAdapter<ConfigOpcion, ConfigOpcionesAdapter.ConfigOpcionViewHolder>(DiffCallback()) {
+) : ListAdapter<ConfigOpcion, ConfigOpcionesAdapter.ViewHolder>(DiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConfigOpcionViewHolder {
-        val binding = ItemConfigOptionBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemConfigOpcionBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
-        return ConfigOpcionViewHolder(binding)
+        return ViewHolder(binding, onOpcionClick)
     }
 
-    override fun onBindViewHolder(holder: ConfigOpcionViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class ConfigOpcionViewHolder(
-        private val binding: ItemConfigOptionBinding
+    class ViewHolder(
+        private val binding: ItemConfigOpcionBinding,
+        private val onOpcionClick: (ConfigOpcion) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(opcion: ConfigOpcion) {
             binding.apply {
                 tvTitulo.text = opcion.titulo
                 tvDescripcion.text = opcion.descripcion
-                iconOption.setImageResource(opcion.icono)
+                ivIcono.setImageResource(opcion.icono)
 
-                cardConfigOption.setOnClickListener {
+                root.setOnClickListener {
                     onOpcionClick(opcion)
                 }
             }
         }
     }
 
-    private class DiffCallback : DiffUtil.ItemCallback<ConfigOpcion>() {
+    class DiffCallback : DiffUtil.ItemCallback<ConfigOpcion>() {
         override fun areItemsTheSame(oldItem: ConfigOpcion, newItem: ConfigOpcion): Boolean {
             return oldItem.id == newItem.id
         }

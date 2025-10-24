@@ -21,10 +21,21 @@
         android:theme="@style/Theme.CanchaYA"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
         <!-- ✅ API KEY DE GOOGLE MAPS -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDnfOY0D-bKa3k7YK6GrejJAk4unEiHYr4" />
+
+        <!-- ✅ Servicio de notificaciones FCM -->
+        <service
+            android:name=".services.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- SPLASH ACTIVITY -->
         <activity
             android:name=".ui.splash.SplashActivity"

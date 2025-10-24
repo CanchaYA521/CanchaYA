@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <!-- Icono del tipo de notificación -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardTipo"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tvTipoIcono"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="24sp"
+                tools:text="🔔" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/tvEstado"
+            app:layout_constraintStart_toEndOf="@+id/cardTipo"
+            app:layout_constraintTop_toTopOf="@+id/cardTipo"
+            tools:text="¡Nueva Promoción Especial!" />
+
+        <!-- Estado -->
+        <TextView
+            android:id="@+id/tvEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvTitulo"
+            tools:text="ENVIADA"
+            tools:textColor="@color/verde" />
+
+        <!-- Mensaje -->
+        <TextView
+            android:id="@+id/tvMensaje"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:textColor="@color/gris_oscuro"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cardTipo"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitulo"
+            tools:text="Reserva hoy con 30% de descuento en todas las canchas" />
+
+        <!-- Destinatarios -->
+        <ImageView
+            android:id="@+id/iconDestinatarios"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/ic_people"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardTipo"
+            app:tint="@color/gris_medio" />
+
+        <TextView
+            android:id="@+id/tvDestinatarios"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:textColor="@color/gris_medio"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/iconDestinatarios"
+            app:layout_constraintEnd_toStartOf="@+id/iconFecha"
+            app:layout_constraintStart_toEndOf="@+id/iconDestinatarios"
+            app:layout_constraintTop_toTopOf="@+id/iconDestinatarios"
+            tools:text="Todos los usuarios" />
+
+        <!-- Fecha -->
+        <ImageView
+            android:id="@+id/iconFecha"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_calendar"
+            app:layout_constraintBottom_toBottomOf="@+id/iconDestinatarios"
+            app:layout_constraintEnd_toStartOf="@+id/tvFecha"
+            app:layout_constraintTop_toTopOf="@+id/iconDestinatarios"
+            app:tint="@color/gris_medio" />
+
+        <TextView
+            android:id="@+id/tvFecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:textColor="@color/gris_medio"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@+id/iconFecha"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/iconFecha"
+            tools:text="24/10/2025 10:30" />
+
+        <!-- Estadísticas (solo visible cuando está enviada) -->
+        <LinearLayout
+            android:id="@+id/layoutEstadisticas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@color/gris_claro"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@+id/iconDestinatarios"
+            tools:visibility="visible">
+
+            <!-- Barra de progreso de vistas -->
+            <ProgressBar
+                android:id="@+id/progressVistas"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="6dp"
+                android:layout_marginBottom="8dp"
+                android:progressTint="@color/azul"
+                tools:progress="75" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <!-- Enviados -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📤 Enviados"
+                        android:textSize="10sp"
+                        android:textColor="@color/gris_medio" />
+
+                    <TextView
+                        android:id="@+id/tvTotalEnviados"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="1,250" />
+
+                </LinearLayout>
+
+                <!-- Vistos -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👁️ Vistos"
+                        android:textSize="10sp"
+                        android:textColor="@color/gris_medio" />
+
+                    <TextView
+                        android:id="@+id/tvTotalVistos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/azul"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="892 (71%)" />
+
+                </LinearLayout>
+
+                <!-- Clics -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="👆 Clics"
+                        android:textSize="10sp"
+                        android:textColor="@color/gris_medio" />
+
+                    <TextView
+                        android:id="@+id/tvTotalClics"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/verde"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="234 (19%)" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Botones de acción -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="end"
+            android:orientation="horizontal"
+            app:layout_constraintTop_toBottomOf="@+id/layoutEstadisticas">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancelar"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                android:textColor="@color/rojo"
+                app:icon="@drawable/ic_cancel"
+                app:iconTint="@color/rojo" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDuplicar"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Duplicar"
+                android:textColor="@color/azul"
+                app:icon="@drawable/ic_copy"
+                app:iconTint="@color/azul" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

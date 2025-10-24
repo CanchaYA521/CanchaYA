@@ -131,5 +131,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
     implementation("de.hdodenhof:circleimageview:3.1.0")
-
+// Firebase Cloud Messaging
+    implementation("com.google.firebase:firebase-messaging:23.4.0")
+// Ya tienes estas (si no, agrégalas)
+    implementation("com.google.firebase:firebase-firestore:24.10.1")
+    implementation("com.google.firebase:firebase-auth:22.3.1")
 }

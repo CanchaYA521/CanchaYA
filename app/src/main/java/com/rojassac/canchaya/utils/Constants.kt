@@ -2,9 +2,10 @@ package com.rojassac.canchaya.utils
 
 object Constants {
 
-    // ========================
-    // Colecciones Firestore
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // 📂 COLECCIONES FIRESTORE
+    // ════════════════════════════════════════════════════════════════
+
     const val USERS_COLLECTION = "users"
     const val CANCHAS_COLLECTION = "canchas"
     const val RESERVAS_COLLECTION = "reservas"
@@ -22,36 +23,41 @@ object Constants {
     const val PROMOCIONES_COLLECTION = "promociones"
     const val CONFIGURACION_COLLECTION = "configuracion"
     const val NOTIFICACIONES_COLLECTION = "notificaciones"
+    const val USER_NOTIFICATIONS_COLLECTION = "user_notifications"
 
     // ⚙️ PARÁMETROS GLOBALES (NUEVO - 23 Oct 2025)
     const val COLLECTION_PARAMETROS = "parametros_globales"
     const val DOC_CONFIG_GLOBAL = "config_global"
 
-    // ========================
-    // SharedPreferences
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // 💾 SHARED PREFERENCES
+    // ════════════════════════════════════════════════════════════════
+
     const val PREFS_NAME = "CanchaYAPrefs"
     const val KEY_USER_ID = "userId"
     const val KEY_USER_ROLE = "userRole"
 
-    // ========================
-    // Códigos de vinculación
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // 🔑 CÓDIGOS DE VINCULACIÓN
+    // ════════════════════════════════════════════════════════════════
+
     const val CODIGO_EXPIRACION_DIAS = 7
     const val CODIGO_LENGTH = 10
     const val CODIGO_PREFIX = "SE"
 
-    // ========================
-    // Estados de Reserva
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // 📊 ESTADOS DE RESERVA
+    // ════════════════════════════════════════════════════════════════
+
     const val ESTADO_PENDIENTE = "PENDIENTE"
     const val ESTADO_CONFIRMADA = "CONFIRMADA"
     const val ESTADO_COMPLETADA = "COMPLETADA"
     const val ESTADO_CANCELADA = "CANCELADA"
 
-    // ========================
-    // Roles de Usuario
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // 👤 ROLES DE USUARIO
+    // ════════════════════════════════════════════════════════════════
+
     const val ROLE_USUARIO = "USUARIO"
     const val ROLE_ADMIN = "ADMIN"
     const val ROLE_SUPERADMIN = "SUPERADMIN"
@@ -62,9 +68,10 @@ object Constants {
     const val PLAN_PREMIUM = "premium"
     const val PLAN_ENTERPRISE = "enterprise"
 
-    // ========================
-    // Deportes disponibles
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // ⚽ DEPORTES DISPONIBLES
+    // ════════════════════════════════════════════════════════════════
+
     val DEPORTES_DISPONIBLES = listOf(
         "Fútbol",
         "Fútbol 7",
@@ -76,9 +83,10 @@ object Constants {
         "Otro"
     )
 
-    // ========================
-    // Tipos de suelo
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // 🏟️ TIPOS DE SUELO
+    // ════════════════════════════════════════════════════════════════
+
     val TIPOS_SUELO = listOf(
         "Grass Natural",
         "Grass Sintético",
@@ -88,22 +96,51 @@ object Constants {
         "Otro"
     )
 
-    // ✅ NUEVO - Formato de fecha (23 Oct 2025)
+    // ════════════════════════════════════════════════════════════════
+    // 📅 FORMATO DE FECHA
+    // ════════════════════════════════════════════════════════════════
+
     const val DATE_FORMAT = "dd/MM/yyyy"
+    const val DATETIME_FORMAT = "dd/MM/yyyy HH:mm"
 
     // ✅ NUEVO - IDs de Configuración (23 Oct 2025)
     const val CONFIGURACION_GLOBAL_ID = "global"
 
-    // ========================
-    // Valores por defecto - Parámetros Globales (NUEVO - 23 Oct 2025)
-    // ========================
+    // ════════════════════════════════════════════════════════════════
+    // ⚙️ VALORES POR DEFECTO - PARÁMETROS GLOBALES (23 Oct 2025)
+    // ════════════════════════════════════════════════════════════════
+
     object DefaultParams {
-        const val ANTICIPACION_MINIMA = 2 // horas
-        const val ANTICIPACION_MAXIMA = 30 // días
-        const val DURACION_MINIMA = 1 // hora
-        const val DURACION_MAXIMA = 4 // horas
-        const val PORCENTAJE_ANTICIPO = 50 // %
-        const val COMISION_PLATAFORMA = 10.0 // %
-        const val MONTO_MINIMO = 20.0 // S/.
+        const val ANTICIPACION_MINIMA = 2         // horas
+        const val ANTICIPACION_MAXIMA = 30        // días
+        const val DURACION_MINIMA = 1             // hora
+        const val DURACION_MAXIMA = 4             // horas
+        const val PORCENTAJE_ANTICIPO = 50        // %
+        const val COMISION_PLATAFORMA = 10.0      // %
+        const val MONTO_MINIMO = 20.0             // S/.
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // 🔔 NOTIFICACIONES (NUEVO - 24 Oct 2025)
+    // ════════════════════════════════════════════════════════════════
+
+    object Notifications {
+        const val CHANNEL_ID = "canchaya_notifications"
+        const val CHANNEL_NAME = "Notificaciones de CanchayA"
+        const val CHANNEL_DESCRIPTION = "Notificaciones importantes de la aplicación"
+
+        // Tipos de notificación
+        const val TYPE_INFO = "INFO"
+        const val TYPE_ALERTA = "ALERTA"
+        const val TYPE_PROMOCION = "PROMOCION"
+        const val TYPE_SISTEMA = "SISTEMA"
+        const val TYPE_EVENTO = "EVENTO"
+
+        // Estados de notificación
+        const val ESTADO_PENDIENTE = "PENDIENTE"
+        const val ESTADO_ENVIADA = "ENVIADA"
+        const val ESTADO_PROGRAMADA = "PROGRAMADA"
+        const val ESTADO_CANCELADA = "CANCELADA"
+        const val ESTADO_ENVIANDO = "ENVIANDO"
     }
 }

@@ -156,4 +156,39 @@
     <color name="chip_background_selector">#E0E0E0</color>
     <color name="text_tertiary">#9E9E9E</color>
 
+    <!-- Nuevos colores (24 Oct 2025) -->
+    <color name="blanco">#FFFFFF</color>
+    <!-- Colores base faltantes -->
+    <color name="fondo">#F5F5F5</color>
+    <color name="negro">#000000</color>
+
+    <!-- Colores primarios -->
+    <color name="primario">#4CAF50</color>
+    <color name="primario_oscuro">#388E3C</color>
+
+    <!-- Colores de grises -->
+    <color name="gris_claro">#E0E0E0</color>
+    <color name="gris_medio">#9E9E9E</color>
+    <color name="gris_oscuro">#424242</color>
+
+    <!-- Colores de estado -->
+    <color name="azul">#2196F3</color>
+    <color name="azul_claro">#E3F2FD</color>
+    <color name="azul_oscuro">#1976D2</color>
+
+    <color name="verde">#4CAF50</color>
+    <color name="verde_claro">#E8F5E9</color>
+
+    <color name="rojo">#F44336</color>
+    <color name="rojo_claro">#FFEBEE</color>
+
+    <color name="naranja">#FF9800</color>
+    <color name="naranja_claro">#FFF3E0</color>
+
+    <color name="morado">#9C27B0</color>
+    <color name="morado_claro">#F3E5F5</color>
+
+    <color name="amarillo">#FFC107</color>
+    <color name="amarillo_claro">#FFF8E1</color>
+
 </resources>
