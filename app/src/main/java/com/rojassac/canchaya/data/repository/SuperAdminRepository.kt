@@ -1,6 +1,11 @@
 package com.rojassac.canchaya.data.repository
 
 import android.net.Uri
+import com.rojassac.canchaya.data.model.ParametrosGlobales
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import java.util.Date
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -665,7 +670,181 @@ class SuperAdminRepository {
         }
     }
 
+    // ══════════════════════════════════════════════════════════════════
+    // ⚙️ PARÁMETROS GLOBALES (NUEVO - 23 Oct 2025)
+    // ══════════════════════════════════════════════════════════════════
+
+    /**
+     * Obtener configuración global (Singleton)
+     * Si no existe, devuelve valores por defecto
+     */
+    suspend fun getParametrosGlobales(): Result<ParametrosGlobales> {
+        return try {
+            val document = firestore
+                .collection(Constants.COLLECTION_PARAMETROS)
+                .document(Constants.DOC_CONFIG_GLOBAL)
+                .get()
+                .await()
+
+            if (document.exists()) {
+                val parametros = document.toObject(ParametrosGlobales::class.java)
+                if (parametros != null) {
+                    Result.success(parametros)
+                } else {
+                    // Si hay error en la deserialización, devolver defaults
+                    Result.success(ParametrosGlobales())
+                }
+            } else {
+                // Si no existe el documento, crear uno con valores por defecto
+                val defaultParams = ParametrosGlobales()
+                firestore
+                    .collection(Constants.COLLECTION_PARAMETROS)
+                    .document(Constants.DOC_CONFIG_GLOBAL)
+                    .set(defaultParams)
+                    .await()
+                Result.success(defaultParams)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Actualizar parámetros globales
+     * Solo actualiza los campos que no sean null
+     */
+    suspend fun actualizarParametrosGlobales(
+        parametros: ParametrosGlobales,
+        userId: String
+    ): Result<Unit> {
+        return try {
+            val parametrosActualizados = parametros.copy(
+                actualizadoPor = userId,
+                fechaActualizacion = Date()
+            )
+
+            firestore
+                .collection(Constants.COLLECTION_PARAMETROS)
+                .document(Constants.DOC_CONFIG_GLOBAL)
+                .set(parametrosActualizados)
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Actualizar un campo específico de los parámetros
+     */
+    suspend fun actualizarCampoParametros(
+        campo: String,
+        valor: Any,
+        userId: String
+    ): Result<Unit> {
+        return try {
+            val updates = hashMapOf<String, Any>(
+                campo to valor,
+                "actualizadoPor" to userId,
+                "fechaActualizacion" to Date()
+            )
+
+            firestore
+                .collection(Constants.COLLECTION_PARAMETROS)
+                .document(Constants.DOC_CONFIG_GLOBAL)
+                .update(updates)
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Resetear parámetros a valores por defecto
+     */
+    suspend fun resetearParametros(userId: String): Result<Unit> {
+        return try {
+            val defaultParams = ParametrosGlobales(
+                actualizadoPor = userId,
+                fechaActualizacion = Date()
+            )
+
+            firestore
+                .collection(Constants.COLLECTION_PARAMETROS)
+                .document(Constants.DOC_CONFIG_GLOBAL)
+                .set(defaultParams)
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Obtener configuración en tiempo real con Flow
+     */
+    fun getParametrosGlobalesFlow(): Flow<ParametrosGlobales> = callbackFlow {
+        val listener = firestore
+            .collection(Constants.COLLECTION_PARAMETROS)
+            .document(Constants.DOC_CONFIG_GLOBAL)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    // En caso de error, enviar valores por defecto
+                    trySend(ParametrosGlobales())
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    val parametros = snapshot.toObject(ParametrosGlobales::class.java)
+                    trySend(parametros ?: ParametrosGlobales())
+                } else {
+                    trySend(ParametrosGlobales())
+                }
+            }
+
+        awaitClose { listener.remove() }
+    }
+
+    /**
+     * Validar si la app está en mantenimiento
+     */
+    suspend fun isAppEnMantenimiento(): Result<Boolean> {
+        return try {
+            val parametros = getParametrosGlobales().getOrNull()
+            Result.success(parametros?.modoMantenimiento ?: false)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Activar/Desactivar modo mantenimiento
+     */
+    suspend fun toggleModoMantenimiento(
+        activar: Boolean,
+        userId: String
+    ): Result<Unit> {
+        return actualizarCampoParametros("modoMantenimiento", activar, userId)
+    }
+
+    /**
+     * Obtener versión mínima requerida
+     */
+    suspend fun getVersionMinimaRequerida(): Result<String> {
+        return try {
+            val parametros = getParametrosGlobales().getOrNull()
+            Result.success(parametros?.versionMinimaRequerida ?: "1.0.0")
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     companion object {
         private const val TAG = "SuperAdminRepository"
     }
+
 }

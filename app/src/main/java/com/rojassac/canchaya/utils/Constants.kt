@@ -23,6 +23,10 @@ object Constants {
     const val CONFIGURACION_COLLECTION = "configuracion"
     const val NOTIFICACIONES_COLLECTION = "notificaciones"
 
+    // ⚙️ PARÁMETROS GLOBALES (NUEVO - 23 Oct 2025)
+    const val COLLECTION_PARAMETROS = "parametros_globales"
+    const val DOC_CONFIG_GLOBAL = "config_global"
+
     // ========================
     // SharedPreferences
     // ========================
@@ -89,4 +93,17 @@ object Constants {
 
     // ✅ NUEVO - IDs de Configuración (23 Oct 2025)
     const val CONFIGURACION_GLOBAL_ID = "global"
+
+    // ========================
+    // Valores por defecto - Parámetros Globales (NUEVO - 23 Oct 2025)
+    // ========================
+    object DefaultParams {
+        const val ANTICIPACION_MINIMA = 2 // horas
+        const val ANTICIPACION_MAXIMA = 30 // días
+        const val DURACION_MINIMA = 1 // hora
+        const val DURACION_MAXIMA = 4 // horas
+        const val PORCENTAJE_ANTICIPO = 50 // %
+        const val COMISION_PLATAFORMA = 10.0 // %
+        const val MONTO_MINIMO = 20.0 // S/.
+    }
 }

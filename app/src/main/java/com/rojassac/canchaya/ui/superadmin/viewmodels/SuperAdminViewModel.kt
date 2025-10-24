@@ -5,6 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.asLiveData
+import com.rojassac.canchaya.data.model.ParametrosGlobales
+import com.google.firebase.auth.FirebaseAuth
 import com.rojassac.canchaya.data.model.Cancha
 import com.rojassac.canchaya.data.model.Plan
 import com.rojassac.canchaya.data.model.Promocion // ✅ AGREGADO (23 Oct 2025)
@@ -18,6 +21,7 @@ import kotlinx.coroutines.launch
 class SuperAdminViewModel : ViewModel() {
 
     private val repository = SuperAdminRepository()
+    private val auth = FirebaseAuth.getInstance()
 
     // ========== USUARIOS ==========
 
@@ -87,6 +91,190 @@ class SuperAdminViewModel : ViewModel() {
 
     private val _estadisticasPromocion = MutableLiveData<Resource<Map<String, Any>>>()
     val estadisticasPromocion: LiveData<Resource<Map<String, Any>>> = _estadisticasPromocion
+
+    // ══════════════════════════════════════════════════════════════════
+    // ⚙️ PARÁMETROS GLOBALES (NUEVO - 23 Oct 2025)
+    // ══════════════════════════════════════════════════════════════════
+
+    // LiveData para los parámetros globales
+    private val _parametrosGlobales = MutableLiveData<Resource<ParametrosGlobales>>()
+    val parametrosGlobales: LiveData<Resource<ParametrosGlobales>> = _parametrosGlobales
+
+    // LiveData para resultado de actualización
+    private val _updateParametrosResult = MutableLiveData<Resource<Unit>>()
+    val updateParametrosResult: LiveData<Resource<Unit>> = _updateParametrosResult
+
+    // LiveData para modo mantenimiento
+    private val _modoMantenimiento = MutableLiveData<Boolean>()
+    val modoMantenimiento: LiveData<Boolean> = _modoMantenimiento
+
+    /**
+     * Cargar parámetros globales
+     */
+    fun loadParametrosGlobales() {
+        viewModelScope.launch {
+            _parametrosGlobales.value = Resource.Loading()
+
+            try {
+                val result = repository.getParametrosGlobales()
+
+                if (result.isSuccess) {
+                    _parametrosGlobales.value = Resource.Success(result.getOrNull()!!)
+                } else {
+                    _parametrosGlobales.value = Resource.Error(
+                        result.exceptionOrNull()?.message ?: "Error al cargar parámetros"
+                    )
+                }
+            } catch (e: Exception) {
+                _parametrosGlobales.value = Resource.Error(e.message ?: "Error desconocido")
+            }
+        }
+    }
+
+    /**
+     * Actualizar parámetros globales
+     */
+    fun actualizarParametrosGlobales(parametros: ParametrosGlobales) {
+        viewModelScope.launch {
+            _updateParametrosResult.value = Resource.Loading()
+
+            try {
+                val userId = auth.currentUser?.uid ?: ""
+                val result = repository.actualizarParametrosGlobales(parametros, userId)
+
+                if (result.isSuccess) {
+                    _updateParametrosResult.value = Resource.Success(Unit)
+                    // Recargar parámetros actualizados
+                    loadParametrosGlobales()
+                } else {
+                    _updateParametrosResult.value = Resource.Error(
+                        result.exceptionOrNull()?.message ?: "Error al actualizar parámetros"
+                    )
+                }
+            } catch (e: Exception) {
+                _updateParametrosResult.value = Resource.Error(e.message ?: "Error desconocido")
+            }
+        }
+    }
+
+    /**
+     * Actualizar un campo específico
+     */
+    fun actualizarCampoParametros(campo: String, valor: Any) {
+        viewModelScope.launch {
+            _updateParametrosResult.value = Resource.Loading()
+
+            try {
+                val userId = auth.currentUser?.uid ?: ""
+                val result = repository.actualizarCampoParametros(campo, valor, userId)
+
+                if (result.isSuccess) {
+                    _updateParametrosResult.value = Resource.Success(Unit)
+                    loadParametrosGlobales()
+                } else {
+                    _updateParametrosResult.value = Resource.Error(
+                        result.exceptionOrNull()?.message ?: "Error al actualizar campo"
+                    )
+                }
+            } catch (e: Exception) {
+                _updateParametrosResult.value = Resource.Error(e.message ?: "Error desconocido")
+            }
+        }
+    }
+
+    /**
+     * Resetear parámetros a valores por defecto
+     */
+    fun resetearParametros() {
+        viewModelScope.launch {
+            _updateParametrosResult.value = Resource.Loading()
+
+            try {
+                val userId = auth.currentUser?.uid ?: ""
+                val result = repository.resetearParametros(userId)
+
+                if (result.isSuccess) {
+                    _updateParametrosResult.value = Resource.Success(Unit)
+                    loadParametrosGlobales()
+                } else {
+                    _updateParametrosResult.value = Resource.Error(
+                        result.exceptionOrNull()?.message ?: "Error al resetear parámetros"
+                    )
+                }
+            } catch (e: Exception) {
+                _updateParametrosResult.value = Resource.Error(e.message ?: "Error desconocido")
+            }
+        }
+    }
+
+    /**
+     * Activar/Desactivar modo mantenimiento
+     */
+    fun toggleModoMantenimiento(activar: Boolean) {
+        viewModelScope.launch {
+            try {
+                val userId = auth.currentUser?.uid ?: ""
+                val result = repository.toggleModoMantenimiento(activar, userId)
+
+                if (result.isSuccess) {
+                    _modoMantenimiento.value = activar
+                    loadParametrosGlobales()
+                }
+            } catch (e: Exception) {
+                // Manejar error
+            }
+        }
+    }
+
+    /**
+     * Observar parámetros en tiempo real
+     */
+    fun observeParametrosGlobales(): LiveData<ParametrosGlobales> {
+        return repository.getParametrosGlobalesFlow()
+            .asLiveData(viewModelScope.coroutineContext)
+    }
+
+    /**
+     * Verificar si la app está en mantenimiento
+     */
+    fun checkModoMantenimiento() {
+        viewModelScope.launch {
+            try {
+                val result = repository.isAppEnMantenimiento()
+                if (result.isSuccess) {
+                    _modoMantenimiento.value = result.getOrNull() ?: false
+                }
+            } catch (e: Exception) {
+                _modoMantenimiento.value = false
+            }
+        }
+    }
+
+    /**
+     * Validar cambios antes de guardar
+     */
+    fun validarParametros(parametros: ParametrosGlobales): String? {
+        return when {
+            parametros.anticipacionMinima < 0 -> "La anticipación mínima no puede ser negativa"
+            parametros.anticipacionMaxima < parametros.anticipacionMinima ->
+                "La anticipación máxima debe ser mayor a la mínima"
+            parametros.duracionMinima < 1 -> "La duración mínima debe ser al menos 1 hora"
+            parametros.duracionMaxima < parametros.duracionMinima ->
+                "La duración máxima debe ser mayor a la mínima"
+            parametros.porcentajeAnticipo < 0 || parametros.porcentajeAnticipo > 100 ->
+                "El porcentaje de anticipo debe estar entre 0 y 100"
+            parametros.comisionPlataforma < 0 || parametros.comisionPlataforma > 100 ->
+                "La comisión debe estar entre 0 y 100"
+            parametros.montoMinimo < 0 -> "El monto mínimo no puede ser negativo"
+            parametros.porcentajeReembolso < 0 || parametros.porcentajeReembolso > 100 ->
+                "El porcentaje de reembolso debe estar entre 0 y 100"
+            parametros.maxReservasActivas < 1 ->
+                "Debe permitirse al menos 1 reserva activa"
+            parametros.tiempoGraciaCancelacion < 0 ->
+                "El tiempo de gracia no puede ser negativo"
+            else -> null // Todo válido
+        }
+    }
 
     // ========== FUNCIONES DE USUARIOS ==========
 

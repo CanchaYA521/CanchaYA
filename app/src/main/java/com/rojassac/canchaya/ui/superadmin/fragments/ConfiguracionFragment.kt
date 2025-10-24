@@ -112,7 +112,11 @@ class ConfiguracionFragment : Fragment() {
     }
 
     private fun navegarAParametrosGlobales() {
-        showToast("Próximamente: Parámetros Globales")
+        val fragment = ParametrosGlobalesFragment()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun navegarANotificaciones() {
