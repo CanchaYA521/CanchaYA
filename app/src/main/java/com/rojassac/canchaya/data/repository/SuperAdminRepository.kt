@@ -5,7 +5,8 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.rojassac.canchaya.data.model.Cancha
-import com.rojassac.canchaya.data.model.Plan // ✅ AGREGADO IMPORT (23 Oct 2025)
+import com.rojassac.canchaya.data.model.Plan
+import com.rojassac.canchaya.data.model.Promocion // ✅ AGREGADO (23 Oct 2025)
 import com.rojassac.canchaya.data.model.Sede
 import com.rojassac.canchaya.data.model.User
 import com.rojassac.canchaya.data.model.UserRole
@@ -29,7 +30,6 @@ class SuperAdminRepository {
 
             val users = snapshot.documents.mapNotNull { doc ->
                 try {
-                    // 🔧 NUEVA FORMA: Manejar fechaCreacion como Timestamp o Long
                     val fechaCreacion = try {
                         when (val fecha = doc.get("fechaCreacion")) {
                             is com.google.firebase.Timestamp -> fecha.toDate().time
@@ -41,7 +41,7 @@ class SuperAdminRepository {
                     }
 
                     User(
-                        uid = doc.id, // ✅ Usar doc.id
+                        uid = doc.id,
                         nombre = doc.getString("nombre") ?: "",
                         celular = doc.getString("celular") ?: "",
                         email = doc.getString("email") ?: "",
@@ -55,7 +55,7 @@ class SuperAdminRepository {
                         canchasAsignadas = (doc.get("canchasAsignadas") as? List<*>)?.filterIsInstance<String>() ?: emptyList(),
                         sedeId = doc.getString("sedeId"),
                         tipoAdministracion = doc.getString("tipoAdministracion"),
-                        fechaCreacion = fechaCreacion, // ✅ Usar la fecha parseada correctamente
+                        fechaCreacion = fechaCreacion,
                         stability = (doc.getLong("stability") ?: 0).toInt()
                     )
                 } catch (e: Exception) {
@@ -403,9 +403,6 @@ class SuperAdminRepository {
 
     // ✅ ========== GESTIÓN DE PLANES (NUEVO - 23 Oct 2025) ==========
 
-    /**
-     * ✅ NUEVA FUNCIÓN: Obtener todos los planes
-     */
     suspend fun getAllPlanes(): Result<List<Plan>> {
         return try {
             Log.d(TAG, "Obteniendo todos los planes...")
@@ -431,9 +428,6 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * ✅ NUEVA FUNCIÓN: Actualizar un plan
-     */
     suspend fun updatePlan(plan: Plan): Result<Unit> {
         return try {
             Log.d(TAG, "Actualizando plan: ${plan.id}")
@@ -468,9 +462,6 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * ✅ NUEVA FUNCIÓN: Obtener cantidad de suscriptores por plan
-     */
     suspend fun getSuscriptoresPorPlan(planId: String): Result<Int> {
         return try {
             val snapshot = firestore.collection(Constants.SUBSCRIPTIONS_COLLECTION)
@@ -486,9 +477,6 @@ class SuperAdminRepository {
         }
     }
 
-    /**
-     * ✅ NUEVA FUNCIÓN: Toggle estado de un plan
-     */
     suspend fun togglePlanStatus(planId: String, activo: Boolean): Result<Unit> {
         return try {
             Log.d(TAG, "Cambiando estado del plan $planId a $activo")
@@ -501,6 +489,178 @@ class SuperAdminRepository {
             Result.success(Unit)
         } catch (e: Exception) {
             Log.e(TAG, "Error al cambiar estado del plan", e)
+            Result.failure(e)
+        }
+    }
+
+    // ✅ ========== GESTIÓN DE PROMOCIONES (NUEVO - 23 Oct 2025) ==========
+
+    suspend fun getAllPromociones(): Result<List<Promocion>> {
+        return try {
+            Log.d(TAG, "Obteniendo todas las promociones...")
+
+            val snapshot = firestore.collection(Constants.PROMOCIONES_COLLECTION)
+                .orderBy("fechaCreacion", com.google.firebase.firestore.Query.Direction.DESCENDING)
+                .get()
+                .await()
+
+            val promociones = snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(Promocion::class.java)?.copy(id = doc.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error al convertir promoción: ${e.message}")
+                    null
+                }
+            }
+
+            Log.d(TAG, "Promociones obtenidas: ${promociones.size}")
+            Result.success(promociones)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al obtener promociones", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun crearPromocion(promocion: Promocion): Result<String> {
+        return try {
+            Log.d(TAG, "Creando promoción: ${promocion.codigo}")
+
+            // Validar que el código no exista
+            val existente = firestore.collection(Constants.PROMOCIONES_COLLECTION)
+                .whereEqualTo("codigo", promocion.codigo)
+                .get()
+                .await()
+
+            if (!existente.isEmpty) {
+                return Result.failure(Exception("El código '${promocion.codigo}' ya existe"))
+            }
+
+            val promocionData = hashMapOf<String, Any>(
+                "codigo" to promocion.codigo,
+                "nombre" to promocion.nombre,
+                "descripcion" to promocion.descripcion,
+                "tipoDescuento" to promocion.tipoDescuento.name,
+                "valorDescuento" to promocion.valorDescuento,
+                "aplicaATodos" to promocion.aplicaATodos,
+                "planesAplicables" to promocion.planesAplicables,
+                "usosMaximos" to promocion.usosMaximos,
+                "usosMaximosPorUsuario" to promocion.usosMaximosPorUsuario,
+                "usosActuales" to 0,
+                "fechaInicio" to promocion.fechaInicio,
+                "fechaFin" to promocion.fechaFin,
+                "activo" to promocion.activo,
+                "creadoPor" to promocion.creadoPor,
+                "fechaCreacion" to System.currentTimeMillis(),
+                "fechaModificacion" to System.currentTimeMillis()
+            )
+
+            val docRef = firestore.collection(Constants.PROMOCIONES_COLLECTION)
+                .add(promocionData)
+                .await()
+
+            Log.d(TAG, "Promoción creada exitosamente: ${docRef.id}")
+            Result.success(docRef.id)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al crear promoción", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun actualizarPromocion(promocion: Promocion): Result<Unit> {
+        return try {
+            Log.d(TAG, "Actualizando promoción: ${promocion.id}")
+
+            val promocionData = hashMapOf<String, Any>(
+                "nombre" to promocion.nombre,
+                "descripcion" to promocion.descripcion,
+                "tipoDescuento" to promocion.tipoDescuento.name,
+                "valorDescuento" to promocion.valorDescuento,
+                "aplicaATodos" to promocion.aplicaATodos,
+                "planesAplicables" to promocion.planesAplicables,
+                "usosMaximos" to promocion.usosMaximos,
+                "usosMaximosPorUsuario" to promocion.usosMaximosPorUsuario,
+                "fechaInicio" to promocion.fechaInicio,
+                "fechaFin" to promocion.fechaFin,
+                "activo" to promocion.activo,
+                "fechaModificacion" to System.currentTimeMillis()
+            )
+
+            firestore.collection(Constants.PROMOCIONES_COLLECTION)
+                .document(promocion.id)
+                .update(promocionData)
+                .await()
+
+            Log.d(TAG, "Promoción actualizada exitosamente")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al actualizar promoción", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun eliminarPromocion(promocionId: String): Result<Unit> {
+        return try {
+            Log.d(TAG, "Eliminando promoción: $promocionId")
+
+            firestore.collection(Constants.PROMOCIONES_COLLECTION)
+                .document(promocionId)
+                .delete()
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al eliminar promoción", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun togglePromocionStatus(promocionId: String, activo: Boolean): Result<Unit> {
+        return try {
+            Log.d(TAG, "Cambiando estado de promoción $promocionId a $activo")
+
+            firestore.collection(Constants.PROMOCIONES_COLLECTION)
+                .document(promocionId)
+                .update(
+                    mapOf(
+                        "activo" to activo,
+                        "fechaModificacion" to System.currentTimeMillis()
+                    )
+                )
+                .await()
+
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al cambiar estado de promoción", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun getEstadisticasPromocion(promocionId: String): Result<Map<String, Any>> {
+        return try {
+            val usosSnapshot = firestore.collection("usos_promociones")
+                .whereEqualTo("promocionId", promocionId)
+                .get()
+                .await()
+
+            val totalUsos = usosSnapshot.size()
+            val usuariosUnicos = usosSnapshot.documents
+                .map { it.getString("userId") }
+                .distinct()
+                .size
+
+            val montoTotalDescontado = usosSnapshot.documents.sumOf {
+                it.getDouble("montoDescuento") ?: 0.0
+            }
+
+            Result.success(
+                mapOf(
+                    "totalUsos" to totalUsos,
+                    "usuariosUnicos" to usuariosUnicos,
+                    "montoTotalDescontado" to montoTotalDescontado
+                )
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "Error al obtener estadísticas de promoción", e)
             Result.failure(e)
         }
     }

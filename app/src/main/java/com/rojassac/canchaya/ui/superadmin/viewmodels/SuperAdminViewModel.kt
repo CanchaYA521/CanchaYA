@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rojassac.canchaya.data.model.Cancha
 import com.rojassac.canchaya.data.model.Plan
+import com.rojassac.canchaya.data.model.Promocion // ✅ AGREGADO (23 Oct 2025)
 import com.rojassac.canchaya.data.model.Sede
 import com.rojassac.canchaya.data.model.User
 import com.rojassac.canchaya.data.model.UserRole
@@ -31,7 +32,6 @@ class SuperAdminViewModel : ViewModel() {
     private val _canchasGlobales = MutableLiveData<Resource<List<Cancha>>>()
     val canchasGlobales: LiveData<Resource<List<Cancha>>> = _canchasGlobales
 
-    // ✅ ALIAS para compatibilidad con código viejo
     val canchas: LiveData<Resource<List<Cancha>>> = _canchasGlobales
 
     private val _deleteCanchaResult = MutableLiveData<Resource<Unit>>()
@@ -60,7 +60,8 @@ class SuperAdminViewModel : ViewModel() {
     private val _estadisticasSedes = MutableLiveData<Resource<Map<String, Int>>>()
     val estadisticasSedes: LiveData<Resource<Map<String, Int>>> = _estadisticasSedes
 
-    // ✅ NUEVO: PLANES
+    // ========== PLANES ==========
+
     private val _planes = MutableLiveData<Resource<List<Plan>>>()
     val planes: LiveData<Resource<List<Plan>>> = _planes
 
@@ -69,6 +70,23 @@ class SuperAdminViewModel : ViewModel() {
 
     private val _suscriptoresPorPlan = MutableLiveData<Map<String, Int>>()
     val suscriptoresPorPlan: LiveData<Map<String, Int>> = _suscriptoresPorPlan
+
+    // ✅ ========== PROMOCIONES (NUEVO - 23 Oct 2025) ==========
+
+    private val _promociones = MutableLiveData<Resource<List<Promocion>>>()
+    val promociones: LiveData<Resource<List<Promocion>>> = _promociones
+
+    private val _createPromocionResult = MutableLiveData<Resource<String>>()
+    val createPromocionResult: LiveData<Resource<String>> = _createPromocionResult
+
+    private val _updatePromocionResult = MutableLiveData<Resource<Unit>>()
+    val updatePromocionResult: LiveData<Resource<Unit>> = _updatePromocionResult
+
+    private val _deletePromocionResult = MutableLiveData<Resource<Unit>>()
+    val deletePromocionResult: LiveData<Resource<Unit>> = _deletePromocionResult
+
+    private val _estadisticasPromocion = MutableLiveData<Resource<Map<String, Any>>>()
+    val estadisticasPromocion: LiveData<Resource<Map<String, Any>>> = _estadisticasPromocion
 
     // ========== FUNCIONES DE USUARIOS ==========
 
@@ -84,7 +102,6 @@ class SuperAdminViewModel : ViewModel() {
         }
     }
 
-    // ✅ ALIAS para compatibilidad
     fun loadAllUsers() = loadUsuarios()
 
     fun updateUserRole(userId: String, newRole: UserRole) {
@@ -137,7 +154,6 @@ class SuperAdminViewModel : ViewModel() {
         }
     }
 
-    // ✅ ALIAS para compatibilidad
     fun loadCanchas() = loadCanchasGlobales()
     fun loadAllCanchas() = loadCanchasGlobales()
 
@@ -179,7 +195,6 @@ class SuperAdminViewModel : ViewModel() {
         }
     }
 
-    // ✅ ALIAS para compatibilidad
     fun cargarSedes() = loadSedes()
 
     fun crearSede(sede: Sede) {
@@ -194,7 +209,6 @@ class SuperAdminViewModel : ViewModel() {
         }
     }
 
-    // ✅ ALIAS para compatibilidad
     fun guardarSede(sede: Sede) = crearSede(sede)
 
     fun actualizarSede(sede: Sede) {
@@ -221,7 +235,6 @@ class SuperAdminViewModel : ViewModel() {
         }
     }
 
-    // ✅ ALIAS para compatibilidad
     fun eliminarSede(sedeId: String) = deleteSede(sedeId)
 
     fun toggleSedeStatus(sedeId: String, isActive: Boolean) {
@@ -286,7 +299,7 @@ class SuperAdminViewModel : ViewModel() {
         }
     }
 
-    // ========== FUNCIONES DE PLANES (✅ NUEVO - 23 Oct 2025) ==========
+    // ========== FUNCIONES DE PLANES ==========
 
     fun loadPlanes() {
         viewModelScope.launch {
@@ -335,6 +348,98 @@ class SuperAdminViewModel : ViewModel() {
                 Resource.Success(Unit)
             } else {
                 Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
+            }
+        }
+    }
+
+    // ✅ ========== FUNCIONES DE PROMOCIONES (NUEVO - 23 Oct 2025) ==========
+
+    /**
+     * ✅ NUEVA: Cargar todas las promociones
+     */
+    fun loadPromociones() {
+        viewModelScope.launch {
+            _promociones.value = Resource.Loading()
+            val result = repository.getAllPromociones()
+            _promociones.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyList())
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cargar promociones")
+            }
+        }
+    }
+
+    /**
+     * ✅ NUEVA: Crear promoción
+     */
+    fun crearPromocion(promocion: Promocion) {
+        viewModelScope.launch {
+            _createPromocionResult.value = Resource.Loading()
+            val result = repository.crearPromocion(promocion)
+            _createPromocionResult.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: "")
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al crear promoción")
+            }
+        }
+    }
+
+    /**
+     * ✅ NUEVA: Actualizar promoción
+     */
+    fun actualizarPromocion(promocion: Promocion) {
+        viewModelScope.launch {
+            _updatePromocionResult.value = Resource.Loading()
+            val result = repository.actualizarPromocion(promocion)
+            _updatePromocionResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al actualizar promoción")
+            }
+        }
+    }
+
+    /**
+     * ✅ NUEVA: Eliminar promoción
+     */
+    fun eliminarPromocion(promocionId: String) {
+        viewModelScope.launch {
+            _deletePromocionResult.value = Resource.Loading()
+            val result = repository.eliminarPromocion(promocionId)
+            _deletePromocionResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al eliminar promoción")
+            }
+        }
+    }
+
+    /**
+     * ✅ NUEVA: Toggle estado de promoción
+     */
+    fun togglePromocionStatus(promocionId: String, activo: Boolean) {
+        viewModelScope.launch {
+            _updatePromocionResult.value = Resource.Loading()
+            val result = repository.togglePromocionStatus(promocionId, activo)
+            _updatePromocionResult.value = if (result.isSuccess) {
+                Resource.Success(Unit)
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error al cambiar estado")
+            }
+        }
+    }
+
+    /**
+     * ✅ NUEVA: Obtener estadísticas de una promoción
+     */
+    fun loadEstadisticasPromocion(promocionId: String) {
+        viewModelScope.launch {
+            _estadisticasPromocion.value = Resource.Loading()
+            val result = repository.getEstadisticasPromocion(promocionId)
+            _estadisticasPromocion.value = if (result.isSuccess) {
+                Resource.Success(result.getOrNull() ?: emptyMap())
+            } else {
+                Resource.Error(result.exceptionOrNull()?.message ?: "Error")
             }
         }
     }

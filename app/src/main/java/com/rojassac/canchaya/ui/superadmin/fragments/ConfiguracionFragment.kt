@@ -11,9 +11,8 @@ import com.rojassac.canchaya.databinding.FragmentConfiguracionBinding
 import com.rojassac.canchaya.ui.superadmin.adapters.ConfigOpcionesAdapter
 
 /**
- * 🔵 ARCHIVO ACTUALIZADO (23 Oct 2025)
- * ANTES: Fragment vacío con "Próximamente..."
- * AHORA: Menú de opciones de configuración para SuperAdmin
+ * ✅ ACTUALIZADO (23 Oct 2025)
+ * Fragment de configuración del SuperAdmin con navegación a submódulos
  */
 class ConfiguracionFragment : Fragment() {
 
@@ -95,9 +94,6 @@ class ConfiguracionFragment : Fragment() {
         }
     }
 
-    /**
-     * 🔵 CORREGIDO: Usar la Activity para navegar
-     */
     private fun navegarAGestionPlanes() {
         val fragment = GestionPlanesFragment()
         requireActivity().supportFragmentManager.beginTransaction()
@@ -107,7 +103,12 @@ class ConfiguracionFragment : Fragment() {
     }
 
     private fun navegarAPromociones() {
-        showToast("Próximamente: Gestión de Promociones")
+        // ✅ CORREGIDO: Navegar al fragment de promociones
+        val fragment = GestionPromocionesFragment()
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun navegarAParametrosGlobales() {
@@ -133,7 +134,7 @@ class ConfiguracionFragment : Fragment() {
 }
 
 /**
- * ✅ NUEVA DATA CLASS: Opción de configuración
+ * ✅ DATA CLASS: Opción de configuración
  */
 data class ConfigOpcion(
     val id: Int,

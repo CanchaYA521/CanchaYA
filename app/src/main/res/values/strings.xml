@@ -221,4 +221,9 @@
     <!-- ✅ NUEVO: Configuración SuperAdmin (23 Oct 2025) -->
     <string name="icono_opcion">Icono de opción</string>
     <string name="ir_a_opcion">Ir a opción</string>
+    <!-- ✅ NUEVO - Promociones (23 Oct 2025) -->
+    <string name="no_hay_promociones">No hay promociones</string>
+    <string name="nueva_promocion">Nueva promoción</string>
+    <string name="icono_promocion">Icono de promoción</string>
+
 </resources>
